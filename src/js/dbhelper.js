@@ -1,3 +1,5 @@
+importScripts('//rawgit.com/jakearchibald/idb/master/lib/idb.js')
+
 var restaurantDb = idb.open('restaurants-db', 1, db => {
   switch(db.oldVersion){
     case 0:
@@ -19,6 +21,19 @@ class DBHelper {
 			else
 				response = restaurantStore.getAll();
 			return response;
+		}).catch(error => {
+			console.error(error);
+		});
+	}
+
+	static storeRestaurant(restaurant){
+		return restaurantDb.then(db => {
+			const tx = db.transaction('restaurant', 'readwrite');
+			const restaurantStore = tx.objectStore('restaurant');
+			restaurantStore.put(restaurant);
+			return tx.complete;
+		}).catch(error => {
+			console.error(error);
 		});
 	}
 

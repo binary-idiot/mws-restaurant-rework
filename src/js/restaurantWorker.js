@@ -13,9 +13,51 @@ self.onmessage = msg => {
 	}
 }
 getRestaurants = filter => {
-	APIHelper.getRestaurant().then((restaurants) => {
-		const filteredRestaurants = filterRestaurants(restaurants, filter);
-	self.postMessage({retrieved: 'restaurants', msgData: filteredRestaurants});
+	DBHelper.getRestaurant().then((restaurants) => {
+		let newRestaurants;
+		
+		if(restaurants){
+			const filteredRestaurants = filterRestaurants(restaurants, filter);
+			self.postMessage({retrieved: 'restaurants', msgData: filteredRestaurants});
+		}
+
+		APIHelper.getRestaurant().then(nr => {
+			newRestaurants = nr;
+			let updatedRestaurants = [];
+
+			if(newRestaurants){
+
+				for(newRestaurant of newRestaurants) {
+					let restaurantFound = false;
+
+					if(restaurants){
+						for(restaurant of restaurants) {
+							if(restaurant.updatedAt === newRestaurant.updatedAt){
+								restaurantFound = true;
+								break;
+							}
+						}
+					}
+
+					if(!restaurantFound){
+						updatedRestaurants.push(newRestaurant);
+					}
+				}
+			}
+
+			return updatedRestaurants;
+		}).then(updatedRestaurants => {
+			if(updatedRestaurants.length != 0){
+
+				const filteredRestaurants = filterRestaurants(newRestaurants, filter);
+				self.postMessage({retrieved: 'restaurants', msgData: filteredRestaurants});
+
+				for(restaurant of updatedRestaurants) {
+					DBHelper.storeRestaurant(restaurant);
+				}
+			}
+		});
+
 	});
 }
 

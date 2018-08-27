@@ -9,7 +9,9 @@ class Home{
 
 handleWorkerMessage = msg => {
 	const data = msg.data;
-	console.log(`${data.retrieved}: ${data.msgData.toString()}`);
+	for(restaurant of data.msgData){
+		console.log(restaurant);
+	}
 }
 
 getRestaurants = worker => {
