@@ -3,7 +3,8 @@
 		// worker to handle all restaurant retrieval
 		let worker = new Worker('/src/js/restaurantWorker.js');
 		worker.onmessage = handleWorkerMessage;
-		getRestaurants(worker, {cuisine: 'Asian', neighborhood: 'Manhattan'});
+		//getRestaurants(worker, {cuisine: 'Asian', neighborhood: 'Manhattan'});
+		getNeighborhoodsAndCuisines(worker);
 	});
 
 /**
@@ -18,7 +19,13 @@ handleWorkerMessage = msg => {
 		case 'restaurants':
 			for(restaurant of content)
 				console.log(restaurant);
-		break;
+			break;
+		case 'neighborhoodsAndCuisines':
+			for(neighborhood of content.neighborhoods)
+				console.log(neighborhood);
+			for(cuisine of content.cuisines)
+				console.log(cuisine)
+			break;
 	}
 }
 
@@ -29,4 +36,8 @@ handleWorkerMessage = msg => {
  */
 getRestaurants = (worker, filter) => {
 	worker.postMessage({action: 'getRestaurants', filter: filter});
+}
+
+getNeighborhoodsAndCuisines = worker => {
+	worker.postMessage({action: 'getNeighborhoodsAndCuisines'});
 }
