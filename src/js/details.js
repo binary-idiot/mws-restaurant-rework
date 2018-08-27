@@ -1,11 +1,10 @@
-class Details{
-	constructor(){
+
+	document.addEventListener('DOMContentLoaded', event => {
 		// worker to handle all restaurant retrieval
 		let worker = new Worker('/src/js/restaurantWorker.js');
 		worker.onmessage = handleWorkerMessage;
 		getRestaurant(worker, 1);
-	}
-}
+	})
 
 /**
  * Handle messages from worker thread

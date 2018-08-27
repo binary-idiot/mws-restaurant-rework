@@ -1,12 +1,10 @@
-class Home{
 
-	constructor(){
+	document.addEventListener('DOMContentLoaded', event => {
 		// worker to handle all restaurant retrieval
 		let worker = new Worker('/src/js/restaurantWorker.js');
 		worker.onmessage = handleWorkerMessage;
 		getRestaurants(worker, {cuisine: 'Asian', neighborhood: 'Manhattan'});
-	}
-}
+	});
 
 /**
  * Handle messages from worker thread
