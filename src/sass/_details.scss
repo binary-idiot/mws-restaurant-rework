@@ -1,0 +1,181 @@
+/* ====================== Restaurant Details ====================== */
+
+.inside{
+	header{
+  		max-width: 100%;
+	}
+
+	#map-container {
+		grid-area: Map;
+
+  		background: blue none repeat scroll 0 0;
+  		height: 400px;
+  		max-width: 100%;
+	}
+
+	#map {
+  		background-color: $grey-4;
+  		height: 100%;
+  		max-width: 100%;
+	}
+
+	#maincontent{
+		@media (min-width: $s-m) {
+			display: grid;
+
+			grid-template-columns: 1fr 1fr;
+			grid-template-areas:
+			"Map Map"
+			"Reviews Restaurant";
+		}
+	}
+}
+
+#restaurant-name {
+	color: $orange-2;
+  	font-family: $main-font-family;
+  	font-size: 20pt;
+  	font-weight: 200;
+  	letter-spacing: 0;
+  	margin: 15px 0 30px;
+  	text-transform: uppercase;
+  	line-height: 1.1;
+  	text-align: center;
+
+  	grid-area: Name;
+}
+
+#restaurant-img {
+	max-width: 100%;
+
+	grid-area: Img;
+	align-self: end;
+}
+
+#restaurant-address {
+  	font-size: 12pt;
+  	margin: 10px 0px;
+	text-align: center;
+
+  	grid-area: Address;
+}
+
+#restaurant-cuisine {
+  	background-color: #333;
+  	color: $grey-5;
+  	font-size: 12pt;
+  	font-weight: 300;
+  	letter-spacing: 10px;
+  	margin: 0 0 20px;
+  	padding: 2px 0;
+  	text-align: center;
+  	text-transform: uppercase;
+	max-width: 100%;
+	height: 24px;
+
+	grid-area: Cuisine;
+
+}
+
+#restaurant-hours{
+	margin: auto;
+	grid-area: Hours;
+
+	td {
+  		color: $grey-8;
+	}
+}
+
+#restaurant-container, #reviews-container {
+  	border-bottom: 1px solid $grey-6;
+  	border-top: 1px solid $white-2;
+  	padding: 20px 15px 20px;
+  	max-width: 100%;
+}
+
+#restaurant-container {
+	grid-area: Restaurant;
+
+	@media (min-width: $xs-s) and (max-width: $xs-s_end) {
+		display: grid;
+
+		grid-template-columns: 1fr 1fr;
+		grid-template-areas:
+		"Name Name"
+		"Img Img"
+		"Cuisine Cuisine"
+		"Hours Address";
+	}
+}
+
+#reviews-container{
+	grid-area: Reviews;
+}
+
+#reviews-list {
+ 	margin: 0;
+  	padding: 0;
+
+	li {
+  		background-color: $white-2;
+    	border: 2px solid $white-3;
+  		list-style-type: none;
+  		overflow: hidden;
+  		max-width: 100%;
+  		border-radius: 30px 30px 30px 0;
+
+		.review-header{
+			grid-area: Header;
+			display: grid;
+			grid-template-columns: 1fr 1fr 3fr;
+			grid-template-rows: auto;
+			grid-template-areas:
+				"Name . Date Date";
+
+			background-color: black;
+
+			padding: 10px 15px 5px;
+
+			.review-name{
+				grid-area: Name;
+				font-weight: bold;
+				color: $grey-6;
+			}
+
+			.review-date{
+				grid-area: Date;
+				color: white;
+			}
+		}
+
+		.review-content{
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			grid-template-rows: auto;
+			grid-template-areas:
+				"Header Header Header"
+				"Rating . ."
+				"Comments Comments Comments";
+
+			padding: 0 20px 20px;
+
+			.review-rating{
+				grid-area: Rating;
+				background-color: orange;
+				border-radius: 5px;
+			}
+
+			.review-comments{
+				grid-area: Comments;
+			}
+		}
+
+
+  		p{
+  			margin: 3px 0;
+  			text-align: center;
+  		}
+	}
+
+}
+

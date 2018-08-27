@@ -1,0 +1,130 @@
+r1body,td,th,p{
+	font-family: $main-font-family;
+	font-size: 10pt;
+	color: $grey-1;
+	line-height: 1.5;
+}
+
+img, embed, object, video{
+  max-width: 100%;
+}
+
+body{
+	background-color: $white-1;
+	margin: 0;
+	width: 100%;
+}
+
+ul, li {
+	font-family: $main-font-family;
+	font-size: 10pt;
+	color: $grey-1;
+}
+
+*:focus{
+  outline: 2px solid $red-1;
+}
+
+a {
+	color: $orange-1;
+	text-decoration: none;
+
+	&:hover, &:focus {
+		color: $blue-3;
+		text-decoration: none;
+	}
+
+	img{
+		border: none 0px $white-2;
+	}
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $main-font-family;
+  margin: 0 0 20px;
+}
+
+article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+
+#maincontent {
+  background-color: $white-3;
+  min-height: 100%;
+  max-width: $l-xl;
+  margin: auto;
+}
+
+#footer {
+  background-color: $grey-2;
+  color: $grey-3;
+  font-size: 8pt;
+  letter-spacing: 1px;
+  padding: 25px;
+  text-align: center;
+  text-transform: uppercase;
+  max-width: 100%;
+}
+
+/* ====================== Navigation ====================== */
+
+#page-title {
+  max-width: 100%;
+  height: 80px;
+  background-color: #252831;
+  text-align:center;
+
+  	h1{
+  		margin: auto;
+  		padding: 10px;
+
+      @media (min-width: $header-adjust){
+        padding-top: 25px
+      }
+
+  		a {
+  			color: $white-2;
+			font-size: 14pt;
+			font-weight: 200;
+			letter-spacing: 10px;
+			text-transform: uppercase;
+  		}
+  	}
+}
+
+#breadcrumb {
+    padding: 10px 40px 16px;
+    list-style: none;
+    background-color: $white-4;
+    font-size: 17px;
+    margin: 0;
+    //width: calc(50% - 80px);
+
+    li {
+    	display: inline;
+
+    	&+li:before {
+    		padding: 8px;
+    		color: $black;
+    		content: "/\00a0";
+		}
+
+		a {
+    		color: $blue-1;
+    		text-decoration: none;
+
+    		&:hover {
+    			color: $blue-2;
+   				text-decoration: underline;
+    		}
+		}
+	}
+}
+
+/* ====================== Map ====================== */
+
+#map {
+	height: 400px;
+	max-width: 100%;
+	background-color: $grey-4;
+}
