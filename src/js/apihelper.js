@@ -11,11 +11,11 @@ class APIHelper{
 
 	/**
 	 * GET restaurants from API
-	 * @param  {Int} id GET specific restaurant if not empty
-	 * @return {Json}    Promise that resolves to restaurant json from API
+	 * @param  {String} query id of restaurant or a url query
+	 * @return {Promise}    Promise that resolves to restaurant json from API
 	 */
-	static getRestaurant(id = ''){
-		return fetch(`${APIHelper.API_URL}/restaurants/${id}`).then(response => {
+	static getRestaurant(query = ''){
+		return fetch(`${APIHelper.API_URL}/restaurants/${query}`).then(response => {
 			if(!response.ok)
 				throw new Error(`Request failed. Returned status of ${response.status}`);
 			return response.json();
@@ -26,7 +26,7 @@ class APIHelper{
 
 	/**
 	 * Retrive favorite restaurants by passing favorite query to getRestaurant()
-	 * @return {Json} Promise that resolves favorite restaurant json from API
+	 * @return {Promise} Promise that resolves favorite restaurant json from API
 	 */
 	static getFavorites(){
 		return getRestaurant('?is_favorite=true');
@@ -36,7 +36,7 @@ class APIHelper{
 	 * Retrive restaurant reviews
 	 * @param  {Int}  id            Id of review or restaurant
 	 * @param  {Boolean} forRestaurant If true will return all reviews for restaurant given by id
-	 * @return {Json}                Promise that resolves to review json from API
+	 * @return {Promise}                Promise that resolves to review json from API
 	 */
 	static getReview(id = '', forRestaurant = false){
 		const queryString = (forRestaurant) ? '?restaurant_id=' : '';

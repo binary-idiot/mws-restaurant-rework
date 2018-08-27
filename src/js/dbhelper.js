@@ -11,6 +11,11 @@ var restaurantDb = idb.open('restaurants-db', 1, db => {
 
 class DBHelper {
 
+	/**
+	 * retrieve restaurants from db
+	 * @param  {Int} id id of restaurant to retrieve, if null all restaurants will be retrieved
+	 * @return {Promise}    Will resolve to an array of retrieved restaurants
+	 */
 	static getRestaurant(id = null) {
 		return restaurantDb.then(db => {
 			const tx = db.transaction('restaurant');
@@ -26,6 +31,11 @@ class DBHelper {
 		});
 	}
 
+	/**
+	 * update restaurant in db
+	 * @param  {Json} restaurant The restaurant data in json
+	 * @return {Promise}            Resolves if restaurant is successfully updated
+	 */
 	static storeRestaurant(restaurant){
 		return restaurantDb.then(db => {
 			const tx = db.transaction('restaurant', 'readwrite');
