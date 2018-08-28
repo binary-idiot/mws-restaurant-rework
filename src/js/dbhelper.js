@@ -16,12 +16,12 @@ class DBHelper {
 	 * @param  {Int} id id of restaurant to retrieve, if null all restaurants will be retrieved
 	 * @return {Promise}    Will resolve to an array of retrieved restaurants
 	 */
-	static getRestaurant(id = null) {
+	static getRestaurant(id = 0) {
 		return restaurantDb.then(db => {
 			const tx = db.transaction('restaurant');
 			const restaurantStore = tx.objectStore('restaurant');
 			let response;
-			if(id != null)
+			if(id != 0)
 				response = restaurantStore.get(Number(id));
 			else
 				response = restaurantStore.getAll();

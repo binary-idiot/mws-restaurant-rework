@@ -27,7 +27,6 @@ handleWorkerMessage = msg => {
 		case 'restaurants':
 			self.restaurants = content;
 			requestAnimationFrame(fillRestaurantsHTML);
-
 			break;
 		case 'neighborhoodsAndCuisines':
 			self.neighborhoods = content.neighborhoods;
