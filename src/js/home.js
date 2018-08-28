@@ -3,10 +3,14 @@ let restaurants,
 	cuisines,
 	worker;
 
+var newMap;
+var markers = [];
+
 	document.addEventListener('DOMContentLoaded', event => {
 		// worker to handle all restaurant retrieval
 		this.worker = new Worker('js/restaurantWorker.js');
 		this.worker.onmessage = handleWorkerMessage;
+		requestAnimationFrame(initMap);
 		updateRestaurants();
 		getNeighborhoodsAndCuisines();
 	});
@@ -32,6 +36,22 @@ handleWorkerMessage = msg => {
 			requestAnimationFrame(fillCuisineHTML);
 			break;
 	}
+}
+
+initMap = () => {
+	self.newMap = L.map('map', {
+	    center: [40.722216, -73.987501],
+	    zoom: 12,
+	    scrollWheelZoom: false
+	  });
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+	mapboxToken: 'pk.eyJ1IjoiYmluYXJ5aWRpb3QiLCJhIjoiY2pqMzZjNWRtMWF2YTNrbXRsb2VueGlydyJ9.mkjp31-552zW210Dz1PUcQ',
+	maxZoom: 18,
+	attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+	  '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+	  'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+	id: 'mapbox.streets'
+	}).addTo(newMap);
 }
 
 /**
@@ -102,7 +122,7 @@ fillRestaurantsHTML = () => {
 
 	for(restaurant of self.restaurants)
 		ul.append(createRestaurantHTML(restaurant));
-	// map markers
+	addMarkersToMap();
 }
 
 /**
@@ -111,7 +131,11 @@ fillRestaurantsHTML = () => {
 resetRestaurants = ul => {
 	ul.innerHTML = '';
 
-	// map markers
+	if(self.markers){
+		for(marker of self.markers)
+			marker.remove();
+	}
+	self.markers = [];
 	
 }
 
@@ -152,4 +176,17 @@ createRestaurantHTML = restaurant => {
 	li.append(more)
 
 	return li
+}
+
+/**
+ * Add map markers for each restaurant
+ */
+addMarkersToMap = () => {
+	for(restaurant of self.restaurants) {
+		const marker = Helper.mapMarkerForRestaurant(restaurant, self.newMap);
+		marker.on("click", () => {
+			window.location.href = marker.options.url;
+		});
+		self.markers.push(marker);
+	}
 }
