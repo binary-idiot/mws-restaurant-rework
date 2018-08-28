@@ -1,11 +1,14 @@
 importScripts('//rawgit.com/jakearchibald/idb/master/lib/idb.js')
 
-var restaurantDb = idb.open('restaurants-db', 1, db => {
+var restaurantDb = idb.open('restaurants-db', 3, db => {
   switch(db.oldVersion){
     case 0:
-    const restaurantStore = db.createObjectStore('restaurant', {keyPath: 'id'});
+    	db.createObjectStore('restaurant', {keyPath: 'id'});
     case 1:
-    const reviewStore = db.createObjectStore('review', {keyPath: 'id'});
+    	db.createObjectStore('review', {keyPath: 'id'});
+    case 2:
+    	const reviewStore = db.transaction.objectStore('review');
+    	reviewStore.createIndex('restaurant', 'restaurant_id');
   }
 });
 
@@ -46,7 +49,57 @@ class DBHelper {
 			console.error(error);
 		});
 	}
+	
+	/**
+	 * retrieve reviews from db
+	 * @param  {Number} id id of review to retrieve
+	 * @return {Promise}    promise that will resolve to review json from db
+	 */
+	static getReview(id = 0){
+		return restaurantDb.then(db => {
+			const tx = db.transaction('review');
+			const reviewStore = tx.objectStore('review');
+			let response;
+			if(id != 0)
+				response = reviewStore.get(Number(id));
+			else
+				response = reviewStore.getAll();
+			return response;
+		}).catch(error => {
+			console.error(error);
+		});
+	}
 
-	TODO: Add getReviews and restaurant_id index
+	/**
+	 * retrieve reviews for restaurant
+	 * @param  {[type]} restaurantId id of restaurant to retrieve reviews for
+	 * @return {Promise}    promise that will resolve to restaurant review json from db
+	 */
+	static getRestaurantReviews(restaurantId){
+		return restaurantDb.then(db => {
+			const tx = db.transaction('review');
+			const reviewStore = tx.objectStore('review');
+			const restaurantReviews = reviewStore.index('restaurant');
 
+			return restaurantReviews.getAll(Number(restaurantId));
+		}).catch(error => {
+			console.error(error);
+		});
+	}
+
+	/**
+	 * store new or updated review in db
+	 * @param  {Json} review Restaurant data in json
+	 * @return {Promise}        Resolves if the review is sucessfully updated
+	 */
+	static storeReview(review){
+		return restaurantDb.then(db => {
+			const tx = db.transaction('review', 'readwrite');
+			const reviewStore = tx.objectStore('review');
+			reviewStore.put(review);
+			return tx.complete;
+		}).catch(error => {
+			console.error(error);
+		});
+	}
 }

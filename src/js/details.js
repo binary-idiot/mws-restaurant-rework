@@ -1,13 +1,21 @@
 let restaurant,
-	worker;
+	worker,
+	id,
+	reviews;
 
 var newMap;
 
 	document.addEventListener('DOMContentLoaded', event => {
+		this.reviews = [];
+
 		// worker to handle all restaurant retrieval
 		this.worker = new Worker('/src/js/restaurantWorker.js');
 		this.worker.onmessage = handleWorkerMessage;
-		getRestaurant(getParameterByName('id'));
+
+		this.id = getParameterByName('id');
+		requestAnimationFrame(initReviews)
+		getRestaurant(this.id);
+		getReviews(this.id);
 	})
 
 /**
@@ -24,6 +32,9 @@ handleWorkerMessage = msg => {
 			requestAnimationFrame(initMap);
 			requestAnimationFrame(fillRestaurantHTML);
 			break;
+		case 'restaurantReviews':
+			addReviews(content);
+			requestAnimationFrame(resetReviews);
 	}
 }
 
@@ -49,6 +60,13 @@ initMap = () => {
 	  Helper.mapMarkerForRestaurant(self.restaurant, self.newMap);
 }
 
+initReviews = () => {
+	const container = document.getElementById('reviews-container');
+	const title = document.createElement('h3');
+	title.innerHTML = 'Reviews';
+	container.appendChild(title);
+}
+
 /**
  * get value of url param
  * @param  {String} name param to search for
@@ -72,6 +90,35 @@ getParameterByName = (name, url) => {
  */
 getRestaurant = (id, worker = self.worker) => {
 	worker.postMessage({action: 'getRestaurant', id: id});
+}
+
+getReviews = (id, worker = self.worker) => {
+	worker.postMessage({action: 'getRestaurantReviews', id: id});
+}
+
+/**
+ * Add or update self.reviews
+ * @param  {Json} newReviews Restaurants to add
+ */
+addReviews = newReviews => {
+
+	for(newReview of newReviews){
+		let reviewFound = false;
+
+		// if review is already in self.reviews then update it otherwise add it to the list;
+		for([index, review] of self.reviews.entries()){
+			if(review.id == newReview.id){
+				reviewFound = true;
+				self.reviews[index] = newReview;
+				break;
+			}
+		}
+
+		if(!reviewFound){
+			self.reviews.push(newReview);
+		}
+	}
+
 }
 
 /**
@@ -140,4 +187,72 @@ fillBreadcrumb = () => {
 	const li = document.createElement('li');
 	li.innerHTML = restaurant.name;
 	breadcrumb.appendChild(li);
+}
+
+fillReviewHTML = () => {
+	const reviews = self.reviews;
+	const container = document.getElementById('reviews-container');
+	
+	if (reviews.length == 0) {
+		const noReviews = document.createElement('p');
+		noReviews.innerHTML = 'No reviews yet!';
+		container.appendChild(noReviews);
+		return;
+	}
+	const ul = document.getElementById('reviews-list');
+	for(review of reviews){
+		ul.appendChild(createReviewHTML(review));
+	}
+	container.appendChild(ul);
+
+}
+
+resetReviews = () => {
+
+	const noReviews = document.getElementById('no-reviews');
+	if(noReviews)
+		noReviews.remove();
+
+	const ul = document.getElementById('reviews-list');
+	ul.innerHTML = '';
+
+	fillReviewHTML();
+}
+
+createReviewHTML = (review) => {
+
+	const li = document.createElement('li');
+
+	const header = document.createElement('div');
+	header.classList.add("review-header");
+
+	const name = document.createElement('p');
+	name.innerHTML = review.name;
+	name.classList.add('review-name');
+	header.appendChild(name);
+
+	const date = document.createElement('p');
+	const dateMili = new Date(review.updatedAt);
+	const dateString = dateMili.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
+	date.innerHTML = dateString;
+	date.classList.add('review-date');
+	header.appendChild(date);
+
+	const content = document.createElement('div');
+	content.classList.add("review-content");
+
+	const rating = document.createElement('p');
+	rating.innerHTML = `Rating: ${review.rating}`;
+	rating.classList.add('review-rating');
+	content.appendChild(rating);
+
+	const comments = document.createElement('p');
+	comments.innerHTML = review.comments;
+	comments.classList.add('review-comments');
+	content.appendChild(comments);
+
+	li.appendChild(header);
+	li.appendChild(content);
+
+	return li;
 }

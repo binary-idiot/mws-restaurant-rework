@@ -25,7 +25,7 @@ handleWorkerMessage = msg => {
 
 	switch(data.retrieved){
 		case 'restaurants':
-			self.restaurants = content;
+			addRestaurants(content);
 			requestAnimationFrame(fillRestaurantsHTML);
 			break;
 		case 'neighborhoodsAndCuisines':
@@ -74,9 +74,36 @@ getNeighborhoodsAndCuisines = (worker = this.worker) => {
 }
 
 /**
+ * Add or update self.restaurants
+ * @param  {Json} newRestaurants Restaurants to add
+ */
+addRestaurants = newRestaurants => {
+
+	for(newRestaurant of newRestaurants){
+		let restaurantFound = false;
+
+		// if restaurant is already in self.restaurants then update it otherwise add it to the list;
+		for([index, restaurant] of self.restaurants.entries()){
+			if(restaurant.id == newRestaurant.id){
+				restaurantFound = true;
+				self.restaurants[index] = newRestaurant;
+				break;
+			}
+		}
+
+		if(!restaurantFound){
+			self.restaurants.push(newRestaurant);
+		}
+	}
+
+}
+
+/**
  * Send selected neighborhood and cuisine to getRestaurants()
  */
 updateRestaurants = () => {
+	resetRestaurants();
+
 	const cSelect = document.getElementById('cuisines-select');
 	const nSelect = document.getElementById('neighborhoods-select');
 
@@ -120,7 +147,6 @@ fillCuisineHTML = () => {
  */
 fillRestaurantsHTML = () => {
 	const ul = document.getElementById('restaurants-list');
-	resetRestaurants(ul);
 
 	for(restaurant of self.restaurants)
 		ul.append(createRestaurantHTML(restaurant));
@@ -130,7 +156,10 @@ fillRestaurantsHTML = () => {
 /**
  * Clear existing restaurants from page
  */
-resetRestaurants = ul => {
+resetRestaurants = () => {
+	self.restaurants = [];
+
+	const ul = document.getElementById('restaurants-list');
 	ul.innerHTML = '';
 
 	if(self.markers){

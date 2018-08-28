@@ -16,6 +16,9 @@ self.onmessage = msg => {
 		case 'getNeighborhoodsAndCuisines':
 			getNeighborhoodsAndCuisines();
 			break;
+		case 'getRestaurantReviews':
+			getRestaurantReviews(data.id);
+			break;
 	}
 }
 
@@ -24,22 +27,22 @@ self.onmessage = msg => {
  * @param  {Json} filter criteria to filter restaurants by before sending back to main thread
  */
 getRestaurants = filter => {
-	DBHelper.getRestaurant().then((restaurants) => {
+	DBHelper.getRestaurant().then((dbRestaurants) => {
 		
 		// If restaurants are retrieved from the db filter them and send them to the main thread
-		if(restaurants){
+		if(dbRestaurants){
 			
-			console.log(`${restaurants.length} restaurants found in db`);
-			const filteredRestaurants = filterRestaurants(restaurants, filter);
+			console.log(`${dbRestaurants.length} restaurants found in db`);
+			const filteredRestaurants = filterRestaurants(dbRestaurants, filter);
 			self.postMessage({retrieved: 'restaurants', msgData: filteredRestaurants});
 		}
 
-		APIHelper.getRestaurant().then(newRestaurants => {
+		APIHelper.getRestaurant().then(apiRestaurants => {
 			
-			const restaurantsUpdated = updateRestaurants(restaurants, newRestaurants);
+			const updatedRestaurants = updateRestaurants(dbRestaurants, apiRestaurants);
 
-			if(restaurantsUpdated){
-				const filteredRestaurants = filterRestaurants(newRestaurants, filter);
+			if(updatedRestaurants){
+				const filteredRestaurants = filterRestaurants(updatedRestaurants, filter);
 				self.postMessage({retrieved: 'restaurants', msgData: filteredRestaurants});
 			}
 		});
@@ -95,6 +98,25 @@ getNeighborhoodsAndCuisines = () => {
 	});
 }
 
+getRestaurantReviews = id => {
+	DBHelper.getRestaurantReviews(id).then(dbReviews => {
+
+		if(dbReviews){
+			console.log(`${dbReviews.length} reviews for restaurant ${id} found in db`);
+
+			self.postMessage({retrieved: 'restaurantReviews', msgData: dbReviews});
+		}
+
+		APIHelper.getReview(id, true).then(apiReviews => {
+			const updatedReviews = updateReviewsDB(dbReviews, apiReviews);
+
+			if(updatedReviews){
+				self.postMessage({retrieved: 'restaurantReviews', msgData: updatedReviews});
+			}
+		})
+	})
+}
+
 /**
  * Filter restaurants by cuisine and neighborhood
  * @param  {Json} restaurants list of restaurants to filter
@@ -135,39 +157,44 @@ extractCuisines = restaurants => {
 }
 
 /**
- * Check if oldRestaurants are out of date and if they are update the db
- * @param  {Json} oldRestaurants Restaurants retrieved from db
- * @param  {Json} newRestaurants Restaurants retrieved from api
- * @return {Boolean}               Returns true if oldRestaurants were out of date
+ * Check if restaurants are out of date and if they are update the db
+ * @param  {Json} dbRestaurants Restaurants retrieved from db
+ * @param  {Json} apiRestaurants Restaurants retrieved from api
+ * @return {Json}               Returns updatedRestaurants
  */
-updateRestaurants = (oldRestaurants, newRestaurants) => {
+updateRestaurants = (dbRestaurants, apiRestaurants) => {
 
 	let updatedRestaurants = [];
 
 	// If restaurants are retrieved from api check to see if they are newer than those in the db
-	if(newRestaurants){
+	if(apiRestaurants){
 
-		for(newRestaurant of newRestaurants) {
+		for(apiRestaurant of apiRestaurants) {
 			let restaurantFound = false;
 
 			// If there are no restaurants retrieved from the db then skip checking and add them to updatedRestaurants
-			if(oldRestaurants){
-				for(restaurant of oldRestaurants) {
-					if(restaurant.updatedAt >= newRestaurant.updatedAt){
-						restaurantFound = true;
-						break;
+			if(dbRestaurants){
+				for(restaurant of dbRestaurants) {
+
+					// If restaurant is found then check to see if its up to date
+					if(restaurant.id == apiRestaurant.id){
+						if(restaurant.updatedAt >= apiRestaurant.updatedAt){
+							restaurantFound = true;
+							break;
+						}
 					}
+
 				}
 			}
 
-			// If restaurant isnt found add it to the list of restaurants to update
+			// If updated restaurant isnt found add it to the list of restaurants to update
 			if(!restaurantFound){
-				updatedRestaurants.push(newRestaurant);
+				updatedRestaurants.push(apiRestaurant);
 			}
 		}
 	}
 
-	// If there are any outdated restaurants in the db update and return true else return false
+	// If there are any outdated restaurants in the db update and return them
 	if(updatedRestaurants.length != 0){
 
 		console.log(`${updatedRestaurants.length} restaurants are outdated, updating...`);
@@ -176,10 +203,10 @@ updateRestaurants = (oldRestaurants, newRestaurants) => {
 			DBHelper.storeRestaurant(restaurant);
 		}
 
-		return true;
+		return updatedRestaurants;
 	}
 
-	return false;
+	return null;
 
 }
 
@@ -208,4 +235,57 @@ updateRestaurant = (oldRestaurant, newRestaurant) => {
 
 		return false;
 	}
+}
+
+/**
+ * Check if reviews are out of date and if they are update the db
+ * @param  {Json} dbReviews Reviews retrieved from db
+ * @param  {Json} apiReviews Reviews retrieved from api
+ * @return {Array}               Returns updatedReviews
+ */
+updateReviewsDB = (dbReviews, apiReviews) => {
+	let updatedReviews = [];
+
+	// If reviews are retrieved from api check to see if they are newer than those in the db
+	if(apiReviews){
+
+		for(apiReview of apiReviews){
+			let reviewFound = false;
+
+			// If there are no reviews retrieved from the db then skip checking and add them to updatedReviews
+			if(dbReviews){
+				for(dbReview of dbReviews){
+
+					// If review is found then check to see if its up to date
+					if(dbReview.id == apiReview.id){
+						if(dbReview.updatedAt >= apiReview.updatedAt){
+							reviewFound = true;
+							break;
+						}
+					}
+
+				}
+			}
+
+			// If updated review isnt found add it to the list of reviews to update
+			if(!reviewFound){
+				updatedReviews.push(apiReview);
+			}
+		}
+
+	}
+
+	// If there are any outdated reviews in the db update and return them
+	if(updatedReviews != 0){
+		console.log(`${updatedReviews.length} reviews are outdated, updating...`);
+
+		for(review of updatedReviews){
+			DBHelper.storeReview(review);
+		}
+
+		return updatedReviews;
+	}
+
+	return null;
+
 }
