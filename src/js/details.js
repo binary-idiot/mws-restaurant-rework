@@ -27,6 +27,9 @@ handleWorkerMessage = msg => {
 	}
 }
 
+/**
+ * Initialize mapbox map
+ */
 initMap = () => {
 	const restaurant = self.restaurant;
 	self.newMap = L.map('map', {
@@ -100,7 +103,7 @@ fillRestaurantHTML = () => {
 	fillRestaurantHoursHTML();
 	}
 
-	//reviews
+	// TODO: Add reviews to page
 	fillBreadcrumb();
 }
 
@@ -132,7 +135,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  */
 fillBreadcrumb = () => {
 	const restaurant = self.restaurant;
-	
+
 	const breadcrumb = document.getElementById('breadcrumb');
 	const li = document.createElement('li');
 	li.innerHTML = restaurant.name;

@@ -47,4 +47,6 @@ class DBHelper {
 		});
 	}
 
+	TODO: Add getReviews and restaurant_id index
+
 }
