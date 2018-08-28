@@ -6,6 +6,8 @@ let restaurant,
 var newMap;
 
 	document.addEventListener('DOMContentLoaded', event => {
+		SWHelper.registerServiceWorker();
+
 		this.reviews = [];
 
 		// worker to handle all restaurant retrieval
@@ -13,7 +15,7 @@ var newMap;
 		this.worker.onmessage = handleWorkerMessage;
 
 		this.id = getParameterByName('id');
-		requestAnimationFrame(initReviews)
+		requestAnimationFrame(initReviews);
 		getRestaurant(this.id);
 		getReviews(this.id);
 	})
@@ -60,6 +62,9 @@ initMap = () => {
 	  Helper.mapMarkerForRestaurant(self.restaurant, self.newMap);
 }
 
+/**
+ * Setup initial review container
+ */
 initReviews = () => {
 	const container = document.getElementById('reviews-container');
 	const title = document.createElement('h3');
@@ -189,6 +194,9 @@ fillBreadcrumb = () => {
 	breadcrumb.appendChild(li);
 }
 
+/**
+ * Add reviews to page
+ */
 fillReviewHTML = () => {
 	const reviews = self.reviews;
 	const container = document.getElementById('reviews-container');
@@ -207,6 +215,9 @@ fillReviewHTML = () => {
 
 }
 
+/**
+ * Reset the review container
+ */
 resetReviews = () => {
 
 	const noReviews = document.getElementById('no-reviews');
@@ -219,6 +230,11 @@ resetReviews = () => {
 	fillReviewHTML();
 }
 
+/**
+ * Create review item
+ * @param  {Json} review The review to create
+ * @return {HTML}        A li of the review
+ */
 createReviewHTML = (review) => {
 
 	const li = document.createElement('li');
@@ -232,7 +248,7 @@ createReviewHTML = (review) => {
 	header.appendChild(name);
 
 	const date = document.createElement('p');
-	const dateMili = new Date(review.updatedAt);
+	const dateMili = new Date(review.updatedAt); // Date is in milliseconds
 	const dateString = dateMili.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
 	date.innerHTML = dateString;
 	date.classList.add('review-date');

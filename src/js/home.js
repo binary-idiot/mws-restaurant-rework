@@ -7,6 +7,8 @@ var newMap;
 var markers = [];
 
 	document.addEventListener('DOMContentLoaded', event => {
+		SWHelper.registerServiceWorker();
+
 		// worker to handle all restaurant retrieval
 		this.worker = new Worker('js/restaurantWorker.js');
 		this.worker.onmessage = handleWorkerMessage;
