@@ -1,5 +1,5 @@
-importScripts('/src/js/apihelper.js',
-	'/src/js/dbhelper.js');
+importScripts('/js/apihelper.js',
+	'/js/dbhelper.js');
 /**
  * Handle message from  main thread
  * @param  {Message} msg Message from main thread
