@@ -14,7 +14,7 @@ var newMap;
 		this.worker = new Worker('/src/js/restaurantWorker.js');
 		this.worker.onmessage = handleWorkerMessage;
 
-		this.id = getParameterByName('id');
+		this.id = Helper.getParameterByName('id');
 		requestAnimationFrame(initReviews);
 		getRestaurant(this.id);
 		getReviews(this.id);
@@ -70,22 +70,6 @@ initReviews = () => {
 	const title = document.createElement('h3');
 	title.innerHTML = 'Reviews';
 	container.appendChild(title);
-}
-
-/**
- * get value of url param
- * @param  {String} name param to search for
- * @param  {String} url  url to search for
- * @return {String}      Value of param
- */
-getParameterByName = (name, url) => {
-  if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
 /**
