@@ -1,0 +1,48 @@
+.review{
+	#breadcrumb{
+		@media (max-width: $header-adjust) {
+			padding-left: 10px;
+			padding-right: 10px;
+		}
+	}
+
+	#restaurant-name{
+		margin: 15px 0;
+	}
+
+	#maincontent{
+		padding: 10px;
+	}
+
+	#review-form{
+		#form-title{
+			width: 100%;
+			text-align: center;
+		}
+
+		.field-container{
+			width: 100%;
+			padding: 10px;
+			text-align: center;
+
+			label{
+				width: 100%;
+				display: block;
+			}
+
+			#review-name{
+				width: 200px;
+				text-align: center;
+			}
+
+			#review-rating{
+				width: 50px;
+			}
+
+			#review-comments{
+				width: 75%;
+				height: 200px;
+			}
+		}
+	}
+}

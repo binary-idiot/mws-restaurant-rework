@@ -19,6 +19,9 @@ self.onmessage = msg => {
 		case 'getRestaurantReviews':
 			getRestaurantReviews(data.id);
 			break;
+		case 'getReview':
+			getReview(data.id);
+			break;
 	}
 }
 
@@ -112,6 +115,25 @@ getRestaurantReviews = id => {
 
 			if(updatedReviews){
 				self.postMessage({retrieved: 'restaurantReviews', msgData: updatedReviews});
+			}
+		})
+	})
+}
+
+getReview = id => {
+	DBHelper.getReview(id).then(dbReview => {
+
+		if(dbReview){
+			console.log(`Review ${id} found in db`);
+
+			self.postMessage({retrieved: 'review', msgData: dbReview});
+		}
+
+		APIHelper.getReview(id).then(apiReview => {
+			const updatedReview = updateReviewDB(dbReview, apiReview);
+
+			if(updatedReview){
+				self.postMessage({retrieved: 'review', msgData:apiReview});
 			}
 		})
 	})
@@ -288,4 +310,31 @@ updateReviewsDB = (dbReviews, apiReviews) => {
 
 	return null;
 
+}
+
+
+/**
+ * Check if review is out of date and if it is update the db
+ * @param  {Json} dbReview Review retrieved from db
+ * @param  {Json} apiReview Review retrieved from api
+ * @return {Boolean}               Returns true if dbReview was out of date
+ */
+updateReviewDB = (dbReview, apiReview) => {
+
+	if(apiReview){
+		let updateReview = true;
+
+		if(dbReview && (dbReview.updatedAt >= apiReview.updatedAt)){
+			updateReview = false;
+		}
+
+		if(updateReview){
+			console.log(`Review ${apiReview.id} outdated, Updating...`);
+			DBHelper.storeReview(apiReview);
+
+			return true;
+		}
+
+		return false;
+	}
 }

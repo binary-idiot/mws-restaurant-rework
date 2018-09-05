@@ -245,22 +245,22 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
     max-width: 100%; }
 
 /* ====================== Restaurant Details ====================== */
-.inside header {
+.details header {
   max-width: 100%; }
 
-.inside #map-container {
+.details #map-container {
   grid-area: Map;
   background: blue none repeat scroll 0 0;
   height: 400px;
   max-width: 100%; }
 
-.inside #map {
+.details #map {
   background-color: #ccc;
   height: 100%;
   max-width: 100%; }
 
 @media (min-width: 768px) {
-  .inside #maincontent {
+  .details #maincontent {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-areas: "Map Map" "Reviews Restaurant"; } }
@@ -365,5 +365,36 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
     #reviews-list li p {
       margin: 3px 0;
       text-align: center; }
+
+@media (max-width: 417px) {
+  .review #breadcrumb {
+    padding-left: 10px;
+    padding-right: 10px; } }
+
+.review #restaurant-name {
+  margin: 15px 0; }
+
+.review #maincontent {
+  padding: 10px; }
+
+.review #review-form #form-title {
+  width: 100%;
+  text-align: center; }
+
+.review #review-form .field-container {
+  width: 100%;
+  padding: 10px;
+  text-align: center; }
+  .review #review-form .field-container label {
+    width: 100%;
+    display: block; }
+  .review #review-form .field-container #review-name {
+    width: 200px;
+    text-align: center; }
+  .review #review-form .field-container #review-rating {
+    width: 50px; }
+  .review #review-form .field-container #review-comments {
+    width: 75%;
+    height: 200px; }
 
 /*# sourceMappingURL=../maps/styles.css.map */
