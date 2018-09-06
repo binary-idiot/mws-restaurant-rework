@@ -1,5 +1,5 @@
 const staticCache = 'restaurant-reviews-static-';
-const staticVer = 'v2';
+const staticVer = 'v3';
 
 self.addEventListener('install', event =>{
 	event.waitUntil(
@@ -47,31 +47,43 @@ self.addEventListener('message', event => {
 
 self.addEventListener('fetch', event => {
 	if(!event.request.url.startsWith('http://localhost:1337/'))
-	event.respondWith(
-
-		// Look for request in cache
-		caches.open(`${staticCache}${staticVer}`).then(cache =>{
-			return cache.match(event.request).then(response => {
-
-				// Fetch requests not in cache
-				if(!response){
-					console.log(`${event.request.url} not in cache, fetching...`);
-					const fetchRequest = event.request.clone();
-					return fetch(fetchRequest).then(fetchResponse =>{
-						
-						// Cache new responses
-						const fr = fetchResponse.clone();
-						cache.put(event.request, fr);
-						return fetchResponse;
+		if(event.request.url.startsWith('http://localhost:8080/restaurant.html')){
+			event.respondWith(
+				caches.open(`${staticCache}${staticVer}`).then(cache => {
+					return cache.match('restaurant.html').then(response => {
+						console.log('Serving restaurant.html from cache');
+						return response;
 					});
+				})
+			);
+		}else{
 
-				}else{
-					console.log(`${event.request.url} in cache, serving...`);
-					return response;
-				}
+			event.respondWith(
 
-			})
-		})
-		
-	);
+				// Look for request in cache
+				caches.open(`${staticCache}${staticVer}`).then(cache =>{
+					return cache.match(event.request).then(response => {
+
+						// Fetch requests not in cache
+						if(!response){
+							console.log(`${event.request.url} not in cache, fetching...`);
+							const fetchRequest = event.request.clone();
+							return fetch(fetchRequest).then(fetchResponse =>{
+								
+								// Cache new responses
+								const fr = fetchResponse.clone();
+								cache.put(event.request, fr);
+								return fetchResponse;
+							});
+
+						}else{
+							console.log(`${event.request.url} in cache, serving...`);
+							return response;
+						}
+
+					})
+				})
+				
+			);
+		}
 });
