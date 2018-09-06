@@ -154,7 +154,7 @@
 			grid-template-rows: auto;
 			grid-template-areas:
 				"Header Header Header"
-				"Rating . ."
+				"Rating . Edit"
 				"Comments Comments Comments";
 
 			padding: 0 20px 20px;
@@ -163,6 +163,12 @@
 				grid-area: Rating;
 				background-color: orange;
 				border-radius: 5px;
+			}
+
+			.review-edit{
+				grid-area: Edit;
+				padding: 5px;
+				text-align: right;
 			}
 
 			.review-comments{

@@ -237,7 +237,6 @@ fillReviewHTML = () => {
  * Fill form review data if updating
  */
 fillReviewForm = () => {
-	console.log('filling review');
 	const review = getReview();
 
 	const name = document.getElementById('review-name');
@@ -264,7 +263,6 @@ resetReviews = () => {
 
 	fillReviewHTML();
 
-console.log('reset');
 	if(self.reviewID){
 		fillReviewForm();
 	}
@@ -301,6 +299,13 @@ createReviewHTML = (review) => {
 	rating.innerHTML = `Rating: ${review.rating}`;
 	rating.classList.add('review-rating');
 	content.appendChild(rating);
+
+	const edit = document.createElement('a');
+	edit.innerHTML = 'Edit';
+	edit.classList.add('review-edit');
+	// Link to restaurant page with review as a param, will also move focus to the edit form automatically
+	edit.href = `${Helper.urlForRestaurant(self.restaurant)}&review=${review.id}#review-form`;
+	content.appendChild(edit);
 
 	const comments = document.createElement('p');
 	comments.innerHTML = review.comments;

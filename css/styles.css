@@ -354,12 +354,16 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: auto;
-      grid-template-areas: "Header Header Header" "Rating . ." "Comments Comments Comments";
+      grid-template-areas: "Header Header Header" "Rating . Edit" "Comments Comments Comments";
       padding: 0 20px 20px; }
       #reviews-list li .review-content .review-rating {
         grid-area: Rating;
         background-color: orange;
         border-radius: 5px; }
+      #reviews-list li .review-content .review-edit {
+        grid-area: Edit;
+        padding: 5px;
+        text-align: right; }
       #reviews-list li .review-content .review-comments {
         grid-area: Comments; }
     #reviews-list li p {
