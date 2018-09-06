@@ -1,7 +1,8 @@
 let restaurant,
 	worker,
 	id,
-	reviews;
+	reviews,
+	reviewID;
 
 var newMap;
 
@@ -15,9 +16,12 @@ var newMap;
 		this.worker.onmessage = handleWorkerMessage;
 
 		this.id = Helper.getParameterByName('id');
+		this.reviewID = Helper.getParameterByName('review');
 		requestAnimationFrame(initReviews);
 		getRestaurant(this.id);
 		getReviews(this.id);
+
+		requestAnimationFrame(fillFormTitle);
 	})
 
 /**
@@ -69,7 +73,7 @@ initReviews = () => {
 	const container = document.getElementById('reviews-container');
 	const title = document.createElement('h3');
 	title.innerHTML = 'Reviews';
-	container.appendChild(title);
+	container.insertBefore(title, container.firstChild);
 }
 
 /**
@@ -81,10 +85,29 @@ getRestaurant = (id, worker = self.worker) => {
 	worker.postMessage({action: 'getRestaurant', id: id});
 }
 
+/**
+ * Have the worker retrieve a review
+ * @param  {int} id     id of review to retrieve
+ * @param  {RestaurantWorker} worker worker to handle request
+ */
 getReviews = (id, worker = self.worker) => {
 	worker.postMessage({action: 'getRestaurantReviews', id: id});
 }
 
+/**
+ * Get review from list of reviews
+ * @param  {int} id id of review to retrieve
+ * @return {Json}    Review from id
+ */
+getReview = (id = self.reviewID) => {
+	for(review of self.reviews){
+		if(review.id == Number(id))
+			return review;
+		
+	}
+
+	return null;
+} 
 /**
  * Add or update self.reviews
  * @param  {Json} newReviews Restaurants to add
@@ -107,6 +130,17 @@ addReviews = newReviews => {
 			self.reviews.push(newReview);
 		}
 	}
+
+}
+
+/**
+ * label form as create or update
+ */
+fillFormTitle = () => {
+	const title = document.getElementById('form-title');
+	const type = (self.reviewID) ? 'Update' : 'Create';
+
+	title.innerHTML = `${type} review`;
 
 }
 
@@ -188,15 +222,32 @@ fillReviewHTML = () => {
 	if (reviews.length == 0) {
 		const noReviews = document.createElement('p');
 		noReviews.innerHTML = 'No reviews yet!';
-		container.appendChild(noReviews);
+		container.insertBefore(noReviews, container.firstChild.nextSibling);
 		return;
 	}
 	const ul = document.getElementById('reviews-list');
 	for(review of reviews){
 		ul.appendChild(createReviewHTML(review));
 	}
-	container.appendChild(ul);
+	container.insertBefore(ul, container.firstChild.nextSibling);
 
+}
+
+/**
+ * Fill form review data if updating
+ */
+fillReviewForm = () => {
+	console.log('filling review');
+	const review = getReview();
+
+	const name = document.getElementById('review-name');
+	name.value = review.name;
+
+	const rating = document.getElementById('review-rating');
+	rating.value = review.rating;
+
+	const comments = document.getElementById('review-comments');
+	comments.value = review.comments;
 }
 
 /**
@@ -212,6 +263,11 @@ resetReviews = () => {
 	ul.innerHTML = '';
 
 	fillReviewHTML();
+
+console.log('reset');
+	if(self.reviewID){
+		fillReviewForm();
+	}
 }
 
 /**
@@ -255,4 +311,11 @@ createReviewHTML = (review) => {
 	li.appendChild(content);
 
 	return li;
+}
+
+/**
+ * Handle form submission
+ */
+handleFormSubmit = () => {
+	console.log("Form submitted");
 }

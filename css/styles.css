@@ -366,35 +366,38 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
       margin: 3px 0;
       text-align: center; }
 
-@media (max-width: 417px) {
-  .review #breadcrumb {
-    padding-left: 10px;
-    padding-right: 10px; } }
-
-.review #restaurant-name {
-  margin: 15px 0; }
-
-.review #maincontent {
-  padding: 10px; }
-
-.review #review-form #form-title {
-  width: 100%;
-  text-align: center; }
-
-.review #review-form .field-container {
-  width: 100%;
+#review-form {
+  background-color: #eee;
+  margin-top: 10px;
   padding: 10px;
-  text-align: center; }
-  .review #review-form .field-container label {
+  display: grid;
+  grid-template-comlums: repeat(5, 1fr);
+  grid-template-rows: 1fr 1fr 4fr 1fr;
+  grid-template-areas: "Title Title Title Title Title" "Name Name . . Rating" "Comments Comments Comments Comments Comments" "Submit Submit Submit Submit Submit"; }
+  #review-form #form-title {
     width: 100%;
-    display: block; }
-  .review #review-form .field-container #review-name {
-    width: 200px;
+    text-align: center;
+    grid-area: Title; }
+  #review-form #form-name-container {
+    grid-area: Name; }
+  #review-form #form-rating-container {
+    grid-area: Rating; }
+  #review-form #form-comments-container {
+    grid-area: Comments; }
+  #review-form #form-submit-container {
+    grid-area: Submit; }
+  #review-form .form-field-container {
     text-align: center; }
-  .review #review-form .field-container #review-rating {
-    width: 50px; }
-  .review #review-form .field-container #review-comments {
-    width: 75%;
-    height: 200px; }
+    #review-form .form-field-container label {
+      width: 100%;
+      display: block; }
+    #review-form .form-field-container #review-name {
+      width: 100%;
+      text-align: center; }
+    #review-form .form-field-container #review-rating {
+      width: 100%; }
+    #review-form .form-field-container #review-comments {
+      width: 100%;
+      height: 80%; }
 
 /*# sourceMappingURL=../maps/styles.css.map */

@@ -55,6 +55,32 @@
     <!-- Beginning reviews -->
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
+
+      <form id="review-form" action="javascript:handleFormSubmit();">
+        <h3 id="form-title"></h3>
+        <div id="form-name-container" class="form-field-container">
+          <label for="review-name" id="review-name-label">Name</label>
+          <input id="review-name" class="form-field" type="text" name="name" role="textbox" contenteditable="true" aria-labeledby="review-name-label">
+        </div>
+        <div id="form-rating-container" class="form-field-container">
+          <label for="review-rating" id="review-rating-label">Rating</label>
+          <select type="text" name="rating" id="review-rating" class="form-field" role="listbox" aria-labeledby="review-rating-label">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div id="form-comments-container" class="form-field-container">
+          <label for="review-comments" id="review-comments-label">Comments</label>
+          <textarea id="review-comments" class="form-field" name="comments" role="textbox" contenteditable="true" aria-labeledby="review-comments-label" aria-multiline="true"></textarea>
+        </div>
+        <div id="form-submit-container" class="form-field-container">
+          <input id="review-submit" type="submit" name="submit" value="submit">
+        </div>
+      </form>
+
     </section>
     <!-- End reviews -->
   </main>

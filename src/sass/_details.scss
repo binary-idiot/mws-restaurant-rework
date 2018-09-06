@@ -179,3 +179,62 @@
 
 }
 
+#review-form{
+	background-color: $white-4;
+	margin-top: 10px;
+	padding: 10px;
+
+	display: grid;
+	grid-template-comlums: repeat(5, 1fr);
+	grid-template-rows: 1fr 1fr 4fr 1fr;
+	grid-template-areas:
+		"Title Title Title Title Title"
+		"Name Name . . Rating"
+		"Comments Comments Comments Comments Comments"
+		"Submit Submit Submit Submit Submit";
+
+	#form-title{
+		width: 100%;
+		text-align: center;
+		grid-area: Title;
+	}
+
+	#form-name-container{
+		grid-area: Name;
+	}
+
+	#form-rating-container{
+		grid-area: Rating;
+	}
+
+	#form-comments-container{
+		grid-area: Comments;
+	}
+
+	#form-submit-container{
+		grid-area: Submit;
+	}
+
+	.form-field-container{
+		text-align: center;
+
+		label{
+			width: 100%;
+			display: block;
+		}
+
+		#review-name{
+			width: 100%;
+			text-align: center;
+		}
+
+		#review-rating{
+			width: 100%;
+		}
+
+		#review-comments{
+			width: 100%;
+			height: 80%;
+		}
+	}
+}

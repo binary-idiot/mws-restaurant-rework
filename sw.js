@@ -6,8 +6,8 @@ self.addEventListener('install', event =>{
 
 		// Precache main application files
 		caches.open(`${staticCache}${staticVer}`).then(cache => {
-			return cache.addAll(['/', '/restaurant.html', '/review.html',
-				'js/home.js', 'js/details.js', 'js/review.js', 'js/restaurantWorker.js',
+			return cache.addAll(['/', '/restaurant.html',
+				'js/home.js', 'js/details.js', 'js/restaurantWorker.js',
 				'js/dbhelper.js', 'js/apihelper.js', 'js/helper.js', 'js/swhelper.js',
 				'css/styles.css',
 				'https://rawgit.com/jakearchibald/idb/master/lib/idb.js',
