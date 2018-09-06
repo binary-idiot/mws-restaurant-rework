@@ -91,3 +91,7 @@ let restaurant,
 	breadcrumb.appendChild(liReview);
 
 }
+
+handleFormSubmit = () => {
+	console.log("Form submitted");
+}

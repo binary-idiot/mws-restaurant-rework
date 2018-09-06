@@ -38,7 +38,7 @@
 	<main id="maincontent">
 		<!-- Start review form -->
 		<section role="form" aria-labelledby="form-title">
-			<form id="review-form">
+			<form id="review-form" action="javascript:handleFormSubmit();">
 				<h3 id="form-title"></h3>
 				<div id="name-container" class="field-container">
 					<label for="review-name" id="review-name-label">Name</label>
@@ -57,6 +57,9 @@
 				<div id="comments-container" class="field-container">
 					<label for="review-comments">Comments</label>
 					<textarea id="review-comments" class="form-field" name="comments" role="textbox" contenteditable="true" aria-labeledby="review-comments-label" aria-multiline="true"></textarea>
+				</div>
+				<div id="submit-container" class="field-container">
+					<input id="review-submit" type="submit" name="submit" value="submit">
 				</div>
 			</form>
 		</section>
