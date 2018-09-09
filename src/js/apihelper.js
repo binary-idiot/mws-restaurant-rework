@@ -53,6 +53,7 @@ class APIHelper{
 	/**
 	 * POST review to API
 	 * @param  {Json} review Review Json
+	 * @return {Boolean}	Return true if successful false if not
 	 */
 	static postReview(review){
 		return fetch(`${APIHelper.API_URL}/reviews/`, {
@@ -61,8 +62,10 @@ class APIHelper{
 		}).then(response => {
 			if(!response.ok)
 				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return true;
 		}).catch(error => {
 			console.error(error);
+			return false;
 		});
 	}
 
@@ -70,13 +73,16 @@ class APIHelper{
 	 * Update favorite restaurants
 	 * @param  {Int} id    Id of restaurant
 	 * @param  {Boolean} state State of favorite
+	 * @return {Boolean}	Return true if successful false if not
 	 */
 	static updateFavorite(id, state){
 		return fetch(`${APIHelper.API_URL}/restaurants/${id}/?is_favorite=${state}`).then(response => {
 			if(!response.ok)
 				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return true;
 		}).catch(error => {
 			console.error(error);
+			return false
 		});
 	}
 
@@ -84,6 +90,7 @@ class APIHelper{
 	 * Update exsisting review
 	 * @param  {Int} id     Id of review to update
 	 * @param  {Json} review Review json
+	 * @return {Boolean}	Return true if successful false if not
 	 */
 	static updateReview(id, review){
 		return fetch(`${APIHelper.API_URL}/reviews/${id}`, {
@@ -92,14 +99,17 @@ class APIHelper{
 		}).then(response => {
 			if(!response.ok)
 				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return true;
 		}).catch(error => {
 			console.error(error(error));
+			return false;
 		});
 	}
 
 	/**
 	 * Delete review
 	 * @param  {Int} id Id of review to delete
+	 * @return {Boolean}	Return true if successful false if not
 	 */
 	static deleteReview(id){
 		return fetch(`${APIHelper.API_URL}/reviews/${id}`, {
@@ -107,8 +117,10 @@ class APIHelper{
 		}).then(response => {
 			if(!response.ok)
 				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return true;
 		}).catch(error => {
 			console.error(error);
+			return false;
 		})
 	}
 }

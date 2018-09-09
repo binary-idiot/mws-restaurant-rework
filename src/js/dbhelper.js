@@ -1,6 +1,6 @@
 importScripts('//rawgit.com/jakearchibald/idb/master/lib/idb.js')
 
-var restaurantDb = idb.open('restaurants-db', 3, db => {
+var restaurantDb = idb.open('restaurants-db', 4, db => {
   switch(db.oldVersion){
     case 0:
     	db.createObjectStore('restaurant', {keyPath: 'id'});
@@ -9,6 +9,8 @@ var restaurantDb = idb.open('restaurants-db', 3, db => {
     case 2:
     	const reviewStore = db.transaction.objectStore('review');
     	reviewStore.createIndex('restaurant', 'restaurant_id');
+    case 3:
+    	db.createObjectStore('unsynced', {autoIncrement: true});
   }
 });
 
@@ -87,6 +89,17 @@ class DBHelper {
 		});
 	}
 
+	static getReviewsToSync(){
+		return restaurantDb.then(db => {
+			const tx = db.transaction('unsynced');
+			const idStore = tx.objectStore('unsynced');
+
+			return idStore.getAll();
+		}).catch(error => {
+			console.error(error);
+		});
+	}
+
 	/**
 	 * store new or updated review in db
 	 * @param  {Json} review Restaurant data in json
@@ -97,6 +110,38 @@ class DBHelper {
 			const tx = db.transaction('review', 'readwrite');
 			const reviewStore = tx.objectStore('review');
 			reviewStore.put(review);
+			return tx.complete;
+		}).catch(error => {
+			console.error(error);
+		});
+	}
+
+	/**
+	 * Store id of unsynced review
+	 * @param  {int} id Id of unsynced restaurant
+	 * @return {Promise}        Resolves if the review is sucessfully updated
+	 */
+	static storeReviewToSync(id){
+		return restaurantDb.then(db => {
+			const tx = db.transaction('unsynced', 'readwrite');
+			const idStore = tx.objectStore('unsynced');
+			idStore.add(id);
+			return tx.complete;
+		}).catch(error => {
+			console.error(error);
+		});
+	}
+
+	/**
+	 * Deletes id with the specified key from unsynced ids
+	 * @param  {int} key Key of id to delete
+	 * @return {Promise}        Resolves if the review is sucessfully updated
+	 */
+	static deleteReviewToSync(key){
+		return restaurantDb.then(db => {
+			const tx = db.transaction('unsynced', 'readwrite');
+			const idStore = tx.objectStore('unsynced');
+			idStore.delete(key);
 			return tx.complete;
 		}).catch(error => {
 			console.error(error);

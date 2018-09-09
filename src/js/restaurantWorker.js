@@ -22,6 +22,11 @@ self.onmessage = msg => {
 		case 'getReview':
 			getReview(data.id);
 			break;
+		case 'createReview':
+			createReview(data.review);
+			break;
+		case 'updateReview':
+			updateReview(data.id, data.review);
 	}
 }
 
@@ -101,6 +106,10 @@ getNeighborhoodsAndCuisines = () => {
 	});
 }
 
+/**
+ * Retrieve all reviews for a restaurant
+ * @param  {int} id Id of restaurant
+ */
 getRestaurantReviews = id => {
 	DBHelper.getRestaurantReviews(id).then(dbReviews => {
 
@@ -120,6 +129,10 @@ getRestaurantReviews = id => {
 	})
 }
 
+/**
+ * Retrieve review
+ * @param  {int} id Id of review to retrieve
+ */
 getReview = id => {
 	DBHelper.getReview(id).then(dbReview => {
 
@@ -137,6 +150,11 @@ getReview = id => {
 			}
 		})
 	})
+}
+
+createReview = review => {
+	//TODO: add reviews to unsynced db then try and upload to api,
+	//	if api post is successful reload restaurants
 }
 
 /**

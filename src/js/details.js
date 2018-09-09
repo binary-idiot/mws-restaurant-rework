@@ -95,6 +95,25 @@ getReviews = (id, worker = self.worker) => {
 }
 
 /**
+ * Have the worker create a review
+ * @param  {[Json]} review Review data for creation
+ * @param  {RestaurantWorker} worker worker to handle request
+ */
+createReview = (review, worker = self.worker) => {
+	worker.postMessage({action: 'createReview', review: review});
+}
+
+/**
+ * Have the worker update a review
+ * @param  {int} id     id of the review to update
+ * @param  {Json} review Review data for update
+ * @param  {RestaurantWorker} worker worker to handle request
+ */
+updateReview = (id, review, worker = self.worker) => {
+	worker.postMessage({action: 'updateReview', id: id, review: review});
+}
+
+/**
  * Get review from list of reviews
  * @param  {int} id id of review to retrieve
  * @return {Json}    Review from id
@@ -322,5 +341,25 @@ createReviewHTML = (review) => {
  * Handle form submission
  */
 handleFormSubmit = () => {
-	console.log("Form submitted");
+	const name = document.getElementById('review-name').value;
+
+	const ratingSelect = document.getElementById('review-rating');
+	const rating = ratingSelect[ratingSelect.selectedIndex].value;
+
+	const comments = document.getElementById('review-comments').value;
+
+	if(reviewID){
+		createReview({
+			'restaurant_id': self.id,
+			'name': name,
+			'rating': rating,
+			'comments': comments
+		});
+	}else{
+		updateReview(self.reviewID, {
+			'name': name,
+			'rating': rating,
+			'comments': comments
+		});
+	}
 }
