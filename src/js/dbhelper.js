@@ -1,6 +1,6 @@
 importScripts('//rawgit.com/jakearchibald/idb/master/lib/idb.js')
 
-var restaurantDb = idb.open('restaurants-db', 4, db => {
+var restaurantDb = idb.open('restaurants-db', 5, db => {
   switch(db.oldVersion){
     case 0:
     	db.createObjectStore('restaurant', {keyPath: 'id'});
@@ -11,6 +11,9 @@ var restaurantDb = idb.open('restaurants-db', 4, db => {
     	reviewStore.createIndex('restaurant', 'restaurant_id');
     case 3:
     	db.createObjectStore('unsynced', {autoIncrement: true});
+    case 4:
+    	const unsyncedStore = db.transaction.objectStore('unsynced');
+    	unsyncedStore.createIndex('mode', 'mode');
   }
 });
 
@@ -89,12 +92,16 @@ class DBHelper {
 		});
 	}
 
+	/**
+	 * retrieve unsynced reviews
+	 * @param  {Number} restaurantId The restaurant to get reviews for
+	 * @return {Promise}              promise that will resolve to review json from db
+	 */
 	static getReviewsToSync(){
 		return restaurantDb.then(db => {
 			const tx = db.transaction('unsynced');
-			const idStore = tx.objectStore('unsynced');
-
-			return idStore.getAll();
+			const unsyncedStore = tx.objectStore('unsynced');
+			return unsyncedStore.getAll();
 		}).catch(error => {
 			console.error(error);
 		});
@@ -121,11 +128,11 @@ class DBHelper {
 	 * @param  {int} id Id of unsynced restaurant
 	 * @return {Promise}        Resolves if the review is sucessfully updated
 	 */
-	static storeReviewToSync(id){
+	static storeReviewToSync(review){
 		return restaurantDb.then(db => {
 			const tx = db.transaction('unsynced', 'readwrite');
-			const idStore = tx.objectStore('unsynced');
-			idStore.add(id);
+			const unsyncedStore = tx.objectStore('unsynced');
+			unsyncedStore.add(review);
 			return tx.complete;
 		}).catch(error => {
 			console.error(error);

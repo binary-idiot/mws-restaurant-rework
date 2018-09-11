@@ -90,11 +90,18 @@
   </footer>
   
   <!-- Start dialog  -->
-  <div id="refresh-dialog" class="hidden" role="alertdialog" aria-labelledby="refreshTitle" aria-describedby="refreshDesc" tabindex="0">
+  <div id="refresh-dialog" class="hidden dialog" role="alertdialog" aria-labelledby="refreshTitle"  tabindex="0">
     <div class="dialog-inner">
       <p id="refreshTitle">Page is out of date</p>
       <button id="refresh-button" value="refresh">Refresh</button>
-      <button id="dismiss-button" value="dismiss">Dismiss</button>
+      <button id="dismiss-refresh-button" value="dismiss">Dismiss</button>
+    </div>
+  </div>
+
+  <div id="update-dialog" class="hidden dialog" role="alertdialog" aria-labelledby="updateTitle"  tabindex="0">
+    <div class="dialog-inner">
+      <p id="updateTitle"></p>
+      <button id="dismiss-update-button" value="dismiss">Dismiss</button>
     </div>
   </div>
 

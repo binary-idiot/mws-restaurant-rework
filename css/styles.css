@@ -99,7 +99,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   background-color: #ccc; }
 
 /* ====================== Dialog ====================== */
-#refresh-dialog {
+.dialog {
   background-color: #ccc;
   position: fixed;
   bottom: 0;
@@ -107,45 +107,63 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   height: 120px;
   z-index: 1000; }
   @media (min-width: 450px) {
-    #refresh-dialog {
+    .dialog {
       height: 70px; } }
   @media (min-width: 574px) {
-    #refresh-dialog {
+    .dialog {
       height: 80px; } }
-  #refresh-dialog .dialog-inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-areas: "Label Label Label" "Refresh . Dismiss";
+  .dialog .dialog-inner {
     align-items: center;
     text-align: center;
     margin: 10px;
     max-width: 900px; }
-    #refresh-dialog .dialog-inner p {
-      grid-area: Label;
-      font-size: 16px;
+    .dialog .dialog-inner p {
       font-weight: bold; }
-      @media (min-width: 574px) {
-        #refresh-dialog .dialog-inner p {
-          font-size: 20px; } }
-    #refresh-dialog .dialog-inner button {
+    .dialog .dialog-inner button {
       min-height: 42px;
       background-color: orange;
       box-shadow: none;
       border: none; }
-    #refresh-dialog .dialog-inner #refresh-button {
-      grid-area: Refresh;
-      align: start; }
-    #refresh-dialog .dialog-inner #dismiss-button {
-      grid-area: Dismiss;
-      align: end; }
-    @media (min-width: 450px) {
-      #refresh-dialog .dialog-inner {
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-        grid-template-areas: "Label Label . Refresh . Dismiss"; } }
-    @media (min-width: 700px) {
-      #refresh-dialog .dialog-inner {
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-        grid-template-areas: "Label Label . Refresh . Dismiss "; } }
+
+#refresh-dialog .dialog-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas: "Label Label Label" "Refresh . Dismiss"; }
+  #refresh-dialog .dialog-inner p {
+    font-size: 16px;
+    grid-area: Label; }
+    @media (min-width: 574px) {
+      #refresh-dialog .dialog-inner p {
+        font-size: 20px; } }
+  #refresh-dialog .dialog-inner #refresh-button {
+    grid-area: Refresh;
+    align: start; }
+  #refresh-dialog .dialog-inner #dismiss-refresh-button {
+    grid-area: Dismiss;
+    align: end; }
+  @media (min-width: 450px) {
+    #refresh-dialog .dialog-inner {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-areas: "Label Label . Refresh . Dismiss"; } }
+  @media (min-width: 700px) {
+    #refresh-dialog .dialog-inner {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-areas: "Label Label . Refresh . Dismiss "; } }
+
+#update-dialog .dialog-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "Label Label Label" ". Dismiss ."; }
+  #update-dialog .dialog-inner p {
+    font-size: 16px;
+    grid-area: Label; }
+  #update-dialog .dialog-inner #dismiss-update-button {
+    grid-area: Dismiss; }
+  @media (min-width: 450px) {
+    #update-dialog .dialog-inner {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      grid-template-areas: "Label Label Label . Dismiss"; } }
 
 #dialog-spacer {
   display: block;

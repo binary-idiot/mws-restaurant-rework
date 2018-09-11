@@ -55,7 +55,7 @@ class APIHelper{
 	 * @param  {Json} review Review Json
 	 * @return {Boolean}	Return true if successful false if not
 	 */
-	static postReview(review){
+	static createReview(review){
 		return fetch(`${APIHelper.API_URL}/reviews/`, {
 			method: "post",
 			body: JSON.stringify(review)

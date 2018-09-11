@@ -41,6 +41,16 @@ handleWorkerMessage = msg => {
 		case 'restaurantReviews':
 			addReviews(content);
 			requestAnimationFrame(resetReviews);
+			break;
+		case 'uploadReview':
+			if(content){
+				requestAnimationFrame(notifyUploadSuccess)
+				getReviews(self.id);
+			}else{
+				requestAnimationFrame(notifyUploadFail)
+			}
+
+			break;
 	}
 }
 
@@ -348,7 +358,7 @@ handleFormSubmit = () => {
 
 	const comments = document.getElementById('review-comments').value;
 
-	if(reviewID){
+	if(!self.reviewID){
 		createReview({
 			'restaurant_id': self.id,
 			'name': name,
@@ -362,4 +372,43 @@ handleFormSubmit = () => {
 			'comments': comments
 		});
 	}
+}
+
+/**
+ * Notify when review fails to upload
+ */
+notifyUploadFail = () => {
+	const notify = 'Review will be uploaded when reconnected.';
+	notifyUpdate(notify);
+}
+
+/**
+ * Notify when review uploads
+ */
+notifyUploadSuccess = () => {
+	const notify = 'Review successfully uploaded.';
+	notifyUpdate(notify);
+}
+
+/**
+ * Display notify dialog
+ * @param  {String} notify Message to display
+ */
+notifyUpdate = notify => {
+	const dialog = document.getElementById('update-dialog');
+	const title = document.getElementById('updateTitle');
+	title.innerHTML = notify;
+
+	const buttons = dialog.getElementsByTagName('button');
+	for(let button of buttons){
+		button.addEventListener('click', e => {
+			document.getElementById('update-dialog').classList.add('hidden');
+    		document.getElementById('dialog-spacer').classList.add('hidden');
+		})
+	}
+
+	dialog.classList.remove('hidden');
+	document.getElementById('dialog-spacer').classList.remove('hidden');
+	document.getElementById('dismiss-update-button').focus();
+
 }

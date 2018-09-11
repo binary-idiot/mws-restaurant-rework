@@ -27,6 +27,7 @@ self.onmessage = msg => {
 			break;
 		case 'updateReview':
 			updateReview(data.id, data.review);
+			break;
 	}
 }
 
@@ -152,9 +153,41 @@ getReview = id => {
 	})
 }
 
+/**
+ * Upload a review to api or store it for upload when reconnected
+ * @param  {Json} review Review to create
+ */
 createReview = review => {
-	//TODO: add reviews to unsynced db then try and upload to api,
-	//	if api post is successful reload restaurants
+	APIHelper.createReview(review).then(success => {
+		if(success){
+			console.log('Review successfully uploaded');
+			self.postMessage({retrieved: 'uploadReview', msgData:true})
+		}else{
+			console.log('Unable to upload review, storing locally until connection is re-established...');
+			DBHelper.storeReviewToSync({'mode': 'create', 'review': review});
+			self.postMessage({retrieved: 'uploadReview', msgData:false});
+		}
+	})
+}
+
+//TODO: add index to db for created/updated fix updates being creates
+
+/**
+ * Update a review in api or store it for upload when reconnected
+ * @param {Int} id Id of the review to update
+ * @param  {Json} review Review to create
+ */
+updateReview = (id, review) => {
+	APIHelper.updateReview(id, review).then(success => {
+		if(success){
+			console.log('Review successfully uploaded');
+			self.postMessage({retrieved: 'uploadReview', msgData:true})
+		}else{
+			console.log('Unable to upload review, storing locally until connection is re-established...');
+			DBHelper.storeReviewToSync({'mode': 'update', 'id': id, 'review': review});
+			self.postMessage({retrieved: 'uploadReview', msgData:false});
+		}
+	})
 }
 
 /**
