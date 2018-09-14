@@ -279,6 +279,20 @@ fillReviewForm = () => {
 }
 
 /**
+ * Clear the fields of the review form
+ */
+clearReviewForm = () => {
+	const name = document.getElementById('review-name');
+	name.value = '';
+
+	const rating = document.getElementById('review-rating');
+	rating.value = 1;
+
+	const comments = document.getElementById('review-comments');
+	comments.value = '';
+}
+
+/**
  * Reset the review container
  */
 resetReviews = () => {
@@ -372,6 +386,9 @@ handleFormSubmit = () => {
 			'comments': comments
 		});
 	}
+
+	clearReviewForm();
+
 }
 
 /**
