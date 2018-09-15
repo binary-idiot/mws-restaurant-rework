@@ -15,8 +15,8 @@ var newMap;
 		this.worker = new Worker('/js/restaurantWorker.js');
 		this.worker.onmessage = handleWorkerMessage;
 
-		this.id = Helper.getParameterByName('id');
-		this.reviewID = Helper.getParameterByName('review');
+		this.id = Number(Helper.getParameterByName('id'));
+		this.reviewID = Number(Helper.getParameterByName('review'));
 		requestAnimationFrame(initReviews);
 		getRestaurant(this.id);
 		getReviews(this.id);
@@ -49,6 +49,7 @@ handleWorkerMessage = msg => {
 				getReviews(self.id);
 			}else{
 				requestAnimationFrame(notifyUploadFail);
+				registerSync();
 			}
 			break;
 		case 'delete':
@@ -56,6 +57,7 @@ handleWorkerMessage = msg => {
 				requestAnimationFrame(notifyDeleteSuccess);
 			}else{
 				requestAnimationFrame(notifyDeleteFail);
+				registerSync();
 			}
 			self.reviews = [];
 			getReviews(self.id);
@@ -178,6 +180,18 @@ addReviews = newReviews => {
 		}
 	}
 
+}
+
+/**
+ * Register serviceWorker sync event
+ * @return {Promise} Resolves if registration is successful
+ */
+registerSync = () => {
+	navigator.serviceWorker.ready.then(reg => {
+		return reg.sync.register('syncReviews')
+	}).catch(error => {
+		console.error(error);
+	});
 }
 
 /**

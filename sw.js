@@ -1,3 +1,6 @@
+importScripts('/js/apihelper.js',
+	'/js/dbhelper.js');
+
 const staticCache = 'restaurant-reviews-static-';
 const staticVer = 'v3';
 
@@ -43,6 +46,60 @@ self.addEventListener('message', event => {
 		self.skipWaiting();
 	}
 
+});
+
+self.addEventListener('sync', event => {
+	if(event.tag == 'syncReviews'){
+		console.log('Syncing');
+		event.waitUntil(
+
+			//TODO: delete using returned keys
+			DBHelper.getOperationsToSync().then(operations => {
+				for([key, operation] of operations.entries()){
+					key++;
+					switch(operation.mode){
+						case 'create':
+							APIHelper.createReview(operation.review).then(success => {
+								if(success){
+									console.log(`${operation.mode} operation successful`);
+									DBHelper.deleteOperationToSync(key);
+								}else{
+									console.log(`${operation.mode} operation failed`);
+									return Promise.reject();
+								}
+							})
+							break;
+						case 'update':
+							APIHelper.updateReview(operation.id, operation.review).then(success => {
+								if(success){
+									console.log(`${operation.mode} operation successful`);
+									DBHelper.deleteOperationToSync(key);
+								}else{
+									console.log(`${operation.mode} operation failed`);
+									return Promise.reject();
+								}
+							})
+							break;
+						case 'delete':
+							APIHelper.deleteReview(operation.id).then(success => {
+								if(success){
+									console.log(`${operation.mode} operation successful`);
+									DBHelper.deleteOperationToSync(key);
+								}else{
+									console.log(`${operation.mode} operation failed`);
+									return Promise.reject();
+								}
+							})
+					}
+
+					return Promise.resolve();
+
+				}
+
+			})
+
+		)
+	}
 });
 
 self.addEventListener('fetch', event => {

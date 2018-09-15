@@ -167,7 +167,7 @@ createReview = review => {
 			self.postMessage({retrieved: 'uploadReview', msgData:true})
 		}else{
 			console.log('Unable to upload review, storing locally until connection is re-established...');
-			DBHelper.storeReviewToSync({'mode': 'create', 'review': review});
+			DBHelper.storeOperationToSync({mode: 'create', review: review});
 			self.postMessage({retrieved: 'uploadReview', msgData:false});
 		}
 	})
@@ -187,7 +187,7 @@ updateReview = (id, review) => {
 			self.postMessage({retrieved: 'uploadReview', msgData:true})
 		}else{
 			console.log('Unable to upload review, storing locally until connection is re-established...');
-			DBHelper.storeReviewToSync({mode: 'update', id: id, review: review});
+			DBHelper.storeOperationToSync({mode: 'update', id: id, review: review});
 			self.postMessage({retrieved: 'uploadReview', msgData:false});
 		}
 	})
@@ -207,7 +207,7 @@ deleteReview = id => {
 				self.postMessage({retrieved: 'delete', msgData: true});
 			}else{
 				console.log('Unable to delete review from api, will try again when reconnected');
-				DBHelper.storeReviewToSync({mode: 'delete', id});
+				DBHelper.storeOperationToSync({mode: 'delete', id});
 				self.postMessage({retrieved: 'delete', msgData: false});
 			}
 		})

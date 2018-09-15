@@ -57,7 +57,7 @@ class APIHelper{
 	 */
 	static createReview(review){
 		return fetch(`${APIHelper.API_URL}/reviews/`, {
-			method: "post",
+			method: 'post',
 			body: JSON.stringify(review)
 		}).then(response => {
 			if(!response.ok)
@@ -94,14 +94,14 @@ class APIHelper{
 	 */
 	static updateReview(id, review){
 		return fetch(`${APIHelper.API_URL}/reviews/${id}`, {
-			method: "put",
+			method: 'put',
 			body: JSON.stringify(review)
 		}).then(response => {
 			if(!response.ok)
 				throw new Error(`Request failed. Returned status of ${response.status}`);
 			return true;
 		}).catch(error => {
-			console.error(error(error));
+			console.error(error);
 			return false;
 		});
 	}
@@ -113,7 +113,7 @@ class APIHelper{
 	 */
 	static deleteReview(id){
 		return fetch(`${APIHelper.API_URL}/reviews/${id}`, {
-			method: "delete"
+			method: 'delete'
 		}).then(response => {
 			if(!response.ok)
 				throw new Error(`Request failed. Returned status of ${response.status}`);

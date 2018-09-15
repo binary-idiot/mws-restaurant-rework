@@ -1,4 +1,4 @@
-importScripts('//rawgit.com/jakearchibald/idb/master/lib/idb.js')
+importScripts('https://rawgit.com/jakearchibald/idb/master/lib/idb.js')
 
 var restaurantDb = idb.open('restaurants-db', 5, db => {
   switch(db.oldVersion){
@@ -97,15 +97,23 @@ class DBHelper {
 	 * @param  {Number} restaurantId The restaurant to get reviews for
 	 * @return {Promise}              promise that will resolve to review json from db
 	 */
-	static getReviewsToSync(){
+	static getOperationsToSync(mode = null){
 		return restaurantDb.then(db => {
 			const tx = db.transaction('unsynced');
 			const unsyncedStore = tx.objectStore('unsynced');
+
+			if(mode){
+				const modeIndex = unsyncedStore.index('mode');
+				return modeIndex.getAll(mode);
+			}
+
 			return unsyncedStore.getAll();
 		}).catch(error => {
 			console.error(error);
 		});
 	}
+
+	//TODO: return promise with data and keys
 
 	/**
 	 * store new or updated review in db
@@ -144,7 +152,7 @@ class DBHelper {
 	 * @param  {int} id Id of unsynced restaurant
 	 * @return {Promise}        Resolves if the review is sucessfully updated
 	 */
-	static storeReviewToSync(review){
+	static storeOperationToSync(review){
 		return restaurantDb.then(db => {
 			const tx = db.transaction('unsynced', 'readwrite');
 			const unsyncedStore = tx.objectStore('unsynced');
@@ -160,7 +168,7 @@ class DBHelper {
 	 * @param  {int} key Key of id to delete
 	 * @return {Promise}        Resolves if the review is sucessfully updated
 	 */
-	static deleteReviewToSync(key){
+	static deleteOperationToSync(key){
 		return restaurantDb.then(db => {
 			const tx = db.transaction('unsynced', 'readwrite');
 			const idStore = tx.objectStore('unsynced');
@@ -170,4 +178,4 @@ class DBHelper {
 			console.error(error);
 		});
 	}
-}
+} 
