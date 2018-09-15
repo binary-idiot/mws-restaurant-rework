@@ -44,12 +44,21 @@ handleWorkerMessage = msg => {
 			break;
 		case 'uploadReview':
 			if(content){
-				requestAnimationFrame(notifyUploadSuccess)
+				requestAnimationFrame(notifyUploadSuccess);
+				self.reviews = [];
 				getReviews(self.id);
 			}else{
-				requestAnimationFrame(notifyUploadFail)
+				requestAnimationFrame(notifyUploadFail);
 			}
-
+			break;
+		case 'delete':
+			if(content){
+				requestAnimationFrame(notifyDeleteSuccess);
+			}else{
+				requestAnimationFrame(notifyDeleteFail);
+			}
+			self.reviews = [];
+			getReviews(self.id);
 			break;
 	}
 }
@@ -121,6 +130,15 @@ createReview = (review, worker = self.worker) => {
  */
 updateReview = (id, review, worker = self.worker) => {
 	worker.postMessage({action: 'updateReview', id: id, review: review});
+}
+
+/**
+ * Have the worker delete the review
+ * @param  {int} id     id of the review to delete
+ * @param  {RestaurantWorker} worker worker to handle the request
+ */
+deleteReview = (id, worker = self.worker) => {
+	worker.postMessage({action: 'deleteReview', id: id});
 }
 
 /**
@@ -267,15 +285,16 @@ fillReviewHTML = () => {
  */
 fillReviewForm = () => {
 	const review = getReview();
+	if(review){
+		const name = document.getElementById('review-name');
+		name.value = review.name;
 
-	const name = document.getElementById('review-name');
-	name.value = review.name;
+		const rating = document.getElementById('review-rating');
+		rating.value = review.rating;
 
-	const rating = document.getElementById('review-rating');
-	rating.value = review.rating;
-
-	const comments = document.getElementById('review-comments');
-	comments.value = review.comments;
+		const comments = document.getElementById('review-comments');
+		comments.value = review.comments;
+	}
 }
 
 /**
@@ -350,6 +369,12 @@ createReviewHTML = (review) => {
 	edit.href = `${Helper.urlForRestaurant(self.restaurant)}&review=${review.id}#review-form`;
 	content.appendChild(edit);
 
+	const deleteReview = document.createElement('a');
+	deleteReview.innerHTML = 'Delete';
+	deleteReview.classList.add('review-delete');
+	deleteReview.addEventListener('click', e => {confirmDelete(review.id)});
+	content.appendChild(deleteReview);
+
 	const comments = document.createElement('p');
 	comments.innerHTML = review.comments;
 	comments.classList.add('review-comments');
@@ -392,6 +417,29 @@ handleFormSubmit = () => {
 }
 
 /**
+ * confirm the deletion of review
+ * @param  {int} id review to delete
+ */
+confirmDelete = id => {
+	const dialog = document.getElementById('delete-dialog');
+
+	const buttons = dialog.getElementsByTagName('button');
+	for(let button of buttons){
+		button.addEventListener('click', e => {
+			if(e.target.value === 'delete'){
+				deleteReview(id);
+			}
+			document.getElementById('delete-dialog').classList.add('hidden');
+    		document.getElementById('dialog-spacer').classList.add('hidden');
+		})
+	}
+
+	dialog.classList.remove('hidden');
+	document.getElementById('dialog-spacer').classList.remove('hidden');
+	document.getElementById('delete-button').focus();
+}
+
+/**
  * Notify when review fails to upload
  */
 notifyUploadFail = () => {
@@ -404,6 +452,22 @@ notifyUploadFail = () => {
  */
 notifyUploadSuccess = () => {
 	const notify = 'Review successfully uploaded.';
+	notifyUpdate(notify);
+}
+
+/**
+ * Notify when review is deleted
+ */
+notifyDeleteSuccess = () => {
+	const notify = 'Review successfully deleted';
+	notifyUpdate(notify);
+}
+
+/**
+ * Notify when review fails to delete
+ */
+notifyDeleteFail = () => {
+	const notify = 'Review will be deleted when reconnected';
 	notifyUpdate(notify);
 }
 

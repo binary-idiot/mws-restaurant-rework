@@ -28,6 +28,9 @@ self.onmessage = msg => {
 		case 'updateReview':
 			updateReview(data.id, data.review);
 			break;
+		case 'deleteReview':
+			deleteReview(data.id);
+			break;
 	}
 }
 
@@ -184,9 +187,30 @@ updateReview = (id, review) => {
 			self.postMessage({retrieved: 'uploadReview', msgData:true})
 		}else{
 			console.log('Unable to upload review, storing locally until connection is re-established...');
-			DBHelper.storeReviewToSync({'mode': 'update', 'id': id, 'review': review});
+			DBHelper.storeReviewToSync({mode: 'update', id: id, review: review});
 			self.postMessage({retrieved: 'uploadReview', msgData:false});
 		}
+	})
+}
+
+/**
+ * Delete review or note it for deletion when reconnected
+ * @param  {int} id id of the review to delete
+ */
+deleteReview = id => {
+	DBHelper.deleteReview(id).then(() =>{
+		console.log('Review deleted from db');
+
+		APIHelper.deleteReview(id).then(success => {
+			if(success){
+				console.log('Review successfully deleted from api');
+				self.postMessage({retrieved: 'delete', msgData: true});
+			}else{
+				console.log('Unable to delete review from api, will try again when reconnected');
+				DBHelper.storeReviewToSync({mode: 'delete', id});
+				self.postMessage({retrieved: 'delete', msgData: false});
+			}
+		})
 	})
 }
 

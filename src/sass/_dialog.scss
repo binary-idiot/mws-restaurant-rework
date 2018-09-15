@@ -89,7 +89,6 @@
   .dialog-inner{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr;
     grid-template-areas:
     "Label Label Label"
     ". Dismiss .";
@@ -109,6 +108,36 @@
         "Label Label Label . Dismiss";
     }
 
+  }
+}
+
+#delete-dialog{
+
+  .dialog-inner{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas:
+    "Label Label Label"
+    "Delete . Cancel";
+
+    p{
+      font-size: 16px;
+      grid-area: Label;
+    }
+
+    #delete-button{
+      grid-area: Delete;
+    }
+
+    #cancel-delete-button{
+      grid-area: Cancel;
+    }
+
+    @media (min-width: $dialog-s) {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-areas:
+      "Label Label . Delete . Cancel";
+    }
   }
 }
 

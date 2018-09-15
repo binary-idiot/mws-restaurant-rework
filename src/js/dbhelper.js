@@ -124,6 +124,22 @@ class DBHelper {
 	}
 
 	/**
+	 * delete restaurant from db
+	 * @param  {int} id id of restaurant to delete
+	 * @return {Promise}        Resolves if the review is sucessfully updated
+	 */
+	static deleteReview(id){
+		return restaurantDb.then(db => {
+			const tx = db.transaction('review', 'readwrite');
+			const reviewStore = tx.objectStore('review');
+			reviewStore.delete(id);
+			return tx.complete
+		}).catch(error => {
+			console.error(error);
+		})
+	}
+
+	/**
 	 * Store id of unsynced review
 	 * @param  {int} id Id of unsynced restaurant
 	 * @return {Promise}        Resolves if the review is sucessfully updated

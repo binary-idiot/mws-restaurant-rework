@@ -153,7 +153,6 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 #update-dialog .dialog-inner {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
   grid-template-areas: "Label Label Label" ". Dismiss ."; }
   #update-dialog .dialog-inner p {
     font-size: 16px;
@@ -164,6 +163,22 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
     #update-dialog .dialog-inner {
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
       grid-template-areas: "Label Label Label . Dismiss"; } }
+
+#delete-dialog .dialog-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas: "Label Label Label" "Delete . Cancel"; }
+  #delete-dialog .dialog-inner p {
+    font-size: 16px;
+    grid-area: Label; }
+  #delete-dialog .dialog-inner #delete-button {
+    grid-area: Delete; }
+  #delete-dialog .dialog-inner #cancel-delete-button {
+    grid-area: Cancel; }
+  @media (min-width: 450px) {
+    #delete-dialog .dialog-inner {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-areas: "Label Label . Delete . Cancel"; } }
 
 #dialog-spacer {
   display: block;
@@ -370,18 +385,22 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
         color: white; }
     #reviews-list li .review-content {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       grid-template-rows: auto;
-      grid-template-areas: "Header Header Header" "Rating . Edit" "Comments Comments Comments";
+      grid-template-areas: "Header Header Header Header" "Rating . Delete Edit" "Comments Comments Comments Comments";
       padding: 0 20px 20px; }
       #reviews-list li .review-content .review-rating {
         grid-area: Rating;
         background-color: orange;
         border-radius: 5px; }
+      #reviews-list li .review-content .review-delete {
+        grid-area: Delete;
+        padding: 5px;
+        text-align: right; }
       #reviews-list li .review-content .review-edit {
         grid-area: Edit;
         padding: 5px;
-        text-align: right; }
+        text-align: left; }
       #reviews-list li .review-content .review-comments {
         grid-area: Comments; }
     #reviews-list li p {
