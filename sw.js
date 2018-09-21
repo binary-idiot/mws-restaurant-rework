@@ -55,46 +55,50 @@ self.addEventListener('sync', event => {
 
 			//TODO: delete using returned keys
 			DBHelper.getOperationsToSync().then(operations => {
-				for([key, operation] of operations.entries()){
-					key++;
-					switch(operation.mode){
+				console.log(operations);
+				if(operations.length != 0)
+				for(operation of operations){
+					const val = operation.value;
+					const key = operation.key;
+
+					switch(val.mode){
 						case 'create':
-							APIHelper.createReview(operation.review).then(success => {
+							APIHelper.createReview(val.review).then(success => {
 								if(success){
-									console.log(`${operation.mode} operation successful`);
+									console.log(`${val.mode} operation successful`);
 									DBHelper.deleteOperationToSync(key);
 								}else{
-									console.log(`${operation.mode} operation failed`);
+									console.log(`${val.mode} operation failed`);
 									return Promise.reject();
 								}
 							})
 							break;
 						case 'update':
-							APIHelper.updateReview(operation.id, operation.review).then(success => {
+							APIHelper.updateReview(val.id, val.review).then(success => {
 								if(success){
-									console.log(`${operation.mode} operation successful`);
+									console.log(`${val.mode} operation successful`);
 									DBHelper.deleteOperationToSync(key);
 								}else{
-									console.log(`${operation.mode} operation failed`);
+									console.log(`${val.mode} operation failed`);
 									return Promise.reject();
 								}
 							})
 							break;
 						case 'delete':
-							APIHelper.deleteReview(operation.id).then(success => {
+							APIHelper.deleteReview(val.id).then(success => {
 								if(success){
-									console.log(`${operation.mode} operation successful`);
+									console.log(`${val.mode} operation successful`);
 									DBHelper.deleteOperationToSync(key);
 								}else{
-									console.log(`${operation.mode} operation failed`);
+									console.log(`${val.mode} operation failed`);
 									return Promise.reject();
 								}
 							})
 					}
 
-					return Promise.resolve();
-
 				}
+				
+				return Promise.resolve();
 
 			})
 

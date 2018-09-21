@@ -94,26 +94,32 @@ class DBHelper {
 
 	/**
 	 * retrieve unsynced reviews
+	 * Thanks to JaromandaX for helping solve this issue in 
+	 * https://stackoverflow.com/questions/52435598/array-from-recursive-promises-returns-undefined
 	 * @param  {Number} restaurantId The restaurant to get reviews for
 	 * @return {Promise}              promise that will resolve to review json from db
 	 */
-	static getOperationsToSync(mode = null){
+	static getOperationsToSync(){
+
 		return restaurantDb.then(db => {
+			let keyVals = [];
+
 			const tx = db.transaction('unsynced');
 			const unsyncedStore = tx.objectStore('unsynced');
 
-			if(mode){
-				const modeIndex = unsyncedStore.index('mode');
-				return modeIndex.getAll(mode);
-			}
+			unsyncedStore.iterateCursor(cursor => {
+				if(!cursor) return;
+				console.log(`key: ${cursor.primaryKey}, val: ${cursor.value}`);
+				keyVals.push({key: cursor.primaryKey, value: cursor.value});
+				cursor.continue();
+			});
 
-			return unsyncedStore.getAll();
+			return tx.complete.then(() => keyVals)
 		}).catch(error => {
 			console.error(error);
 		});
-	}
 
-	//TODO: return promise with data and keys
+	}
 
 	/**
 	 * store new or updated review in db
