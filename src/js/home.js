@@ -74,6 +74,14 @@ getRestaurants = (filter, worker = this.worker) => {
 getNeighborhoodsAndCuisines = (worker = this.worker) => {
 	worker.postMessage({action: 'getNeighborhoodsAndCuisines'});
 }
+/**
+ * Have the worker set favorite to the other state 
+ * @param  {Json} restaurant The restaurant to (un)favorite
+ * @param  {RestaurantWorker} worker worker to handle request
+ */
+toggleFavorite = (restaurant, worker = this.worker) => {
+	worker.postMessage({action: 'setFavorite', id:restaurant.id, state:!restaurant.is_favorite});
+}
 
 /**
  * Add or update self.restaurants
@@ -180,6 +188,13 @@ resetRestaurants = () => {
 createRestaurantHTML = restaurant => {
 	const li = document.createElement('li');
 
+	if(restaurant.is_favorite){
+		li.classList.add('favorited');
+		li.setAttribute('aria-label', 'Favorite Restaurant');
+	}else{
+		li.setAttribute('aria-label', 'Restaurant');
+	}
+
 	const image = document.createElement('img');
 	const imgSrc = Helper.imageUrlForRestaurant(restaurant); 
 	image.className = 'restaurant-img';
@@ -189,23 +204,36 @@ createRestaurantHTML = restaurant => {
 	image.alt = restaurant.alt;
 	li.append(image);
 
+
+	const titleContainer = document.createElement('div');
+	titleContainer.classList.add('restaurant-container');
+
 	const name = document.createElement('h2');
 	name.innerHTML = restaurant.name;
-	li.append(name);
+	titleContainer.append(name);
+
+	const fav = document.createElement('button');
+	fav.innerHTML = '★';
+	fav.onclick = e => {toggleFavorite(restaurant)};
+	fav.classList.add('fav-button');
+	fav.setAttribute('aria-label', 'Toggle favorite');
+	titleContainer.append(fav);
 
 	const neighborhood = document.createElement('p');
 	neighborhood.innerHTML = restaurant.neighborhood;
-	li.append(neighborhood);
+	titleContainer.append(neighborhood);
 
 	const address = document.createElement('p');
 	const adr = restaurant.address.replace(/,/, ',<br>');
 	address.innerHTML = adr;
-	li.append(address);
+	titleContainer.append(address);
+
+	li.append(titleContainer);
+
 
 	const more = document.createElement('a');
 	more.innerHTML = 'View Details';
 	more.href = Helper.urlForRestaurant(restaurant);
-	more.setAttribute('role', 'button')
 	li.append(more)
 
 	return li

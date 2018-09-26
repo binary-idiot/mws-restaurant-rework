@@ -54,6 +54,19 @@ class DBHelper {
 			console.error(error);
 		});
 	}
+
+	/**
+	 * set restaurant favorite state
+	 * @param {int} id    id of restaurant to update
+	 * @param {Boolean} state true to favorite restaurant false to unfavorite
+	 * @return {Promise}            Resolves if restaurant is successfully updated
+	 */
+	static setFavorite(id, state){
+		return this.getRestaurant(id).then(restaurant => {
+			restaurant.is_favorite = state;
+			return this.storeRestaurant(restaurant);
+		});
+	}
 	
 	/**
 	 * retrieve reviews from db

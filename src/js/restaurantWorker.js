@@ -31,6 +31,9 @@ self.onmessage = msg => {
 		case 'deleteReview':
 			deleteReview(data.id);
 			break;
+		case 'setFavorite':
+			setFavorite(data.id, data.state);
+			break;
 	}
 }
 
@@ -207,8 +210,31 @@ deleteReview = id => {
 				self.postMessage({retrieved: 'delete', msgData: true});
 			}else{
 				console.log('Unable to delete review from api, will try again when reconnected');
-				DBHelper.storeOperationToSync({mode: 'delete', id});
+				DBHelper.storeOperationToSync({mode: 'delete', id:id});
 				self.postMessage({retrieved: 'delete', msgData: false});
+			}
+		})
+	})
+}
+
+/**
+ * set restaurant favorite state
+ * @param {int} id    id of restaurant to update
+ * @param {Boolean} state true to favorite restaurant false to unfavorite
+ */
+setFavorite = (id, state) => {
+	DBHelper.setFavorite(id, state).then(() => {
+		const stateString = (state)? 'favorited':'unfavorited';
+		console.log(`Restaurant ${id} ${stateString}`);
+
+		APIHelper.updateFavorite(id, state).then(success =>{
+			if(success){
+				console.log(`Restaurant ${stateString} in api`);
+				self.postMessage({retrieved: 'favorited', msgData: true});
+			}else{
+				console.log('Unable to update favorite in api will try again when reconnected');
+				DBHelper.storeOperationToSync({mode: 'favorite', id:id, state:state});
+				self.postMessage({retrieved: 'favorited', msgData: false});
 			}
 		})
 	})

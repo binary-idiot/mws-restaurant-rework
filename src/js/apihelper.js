@@ -76,7 +76,7 @@ class APIHelper{
 	 * @return {Boolean}	Return true if successful false if not
 	 */
 	static updateFavorite(id, state){
-		return fetch(`${APIHelper.API_URL}/restaurants/${id}/?is_favorite=${state}`).then(response => {
+		return fetch(`${APIHelper.API_URL}/restaurants/${id}/?is_favorite=${state}`, {method: 'put'}).then(response => {
 			if(!response.ok)
 				throw new Error(`Request failed. Returned status of ${response.status}`);
 			return true;
