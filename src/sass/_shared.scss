@@ -147,7 +147,11 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   -moz-appearance: none;
 
   &:hover{
-    color: $orange-2;
+    text-shadow:
+    -1px -1px 0 $orange-2,
+    1px -1px 0 $orange-2,
+    -1px 1px 0 $orange-2,
+    1px 1px 0 $orange-2; 
   }
 
 }

@@ -113,7 +113,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   -webkit-appearance: none;
   -moz-appearance: none; }
   .fav-button:hover {
-    color: #f18200; }
+    text-shadow: -1px -1px 0 #f18200, 1px -1px 0 #f18200, -1px 1px 0 #f18200, 1px 1px 0 #f18200; }
 
 .favorited {
   color: orange; }
@@ -329,7 +329,8 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   display: grid;
   grid-template-columns: 5fr 1fr;
   grid-column-gap: 10px;
-  margin: 15px 0 30px; }
+  margin: 15px 0 30px;
+  grid-area: Title; }
   #title-container #restaurant-name {
     color: #f18200;
     font-family: Arial, sans-serif;
