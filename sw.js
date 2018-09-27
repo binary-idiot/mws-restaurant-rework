@@ -94,6 +94,18 @@ self.addEventListener('sync', event => {
 									return Promise.reject();
 								}
 							})
+							break;
+						case 'favorite':
+							APIHelper.updateReview(val.id, val.state).then(success => {
+								if(success){
+									console.log(`${val.mode} operation successful`);
+									DBHelper.deleteOperationToSync(key);
+								}else{
+									console.log(`${val.mode} operation failed`);
+									return Promise.reject();
+								}
+							})
+							break;
 					}
 
 				}

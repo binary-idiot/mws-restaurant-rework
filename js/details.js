@@ -52,7 +52,7 @@ handleWorkerMessage = msg => {
 				getReviews(self.id);
 			}else{
 				requestAnimationFrame(notifyUploadFail);
-				Helper.registerSync();
+				registerSync();
 			}
 			break;
 		case 'delete':
@@ -60,17 +60,29 @@ handleWorkerMessage = msg => {
 				requestAnimationFrame(notifyDeleteSuccess);
 			}else{
 				requestAnimationFrame(notifyDeleteFail);
-				Helper.registerSync();
+				registerSync();
 			}
 			self.reviews = [];
 			getReviews(self.id);
 			break;
 		case 'favorited':
 			if(!content)
-				Helper.registerSync();
+				registerSync();
 			getRestaurant(self.id);
 			break;
 	}
+}
+
+/**
+ * Register serviceWorker sync event
+ * @return {Promise} Resolves if registration is successful
+ */
+registerSync = () =>{
+	navigator.serviceWorker.ready.then(reg => {
+		return reg.sync.register('syncReviews')
+	}).catch(error => {
+		console.error(error);
+	});
 }
 
 /**

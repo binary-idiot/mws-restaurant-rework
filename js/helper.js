@@ -51,17 +51,6 @@ class Helper {
 	    return decodeURIComponent(results[2].replace(/\+/g, ' '));
 	}
 
-	/**
-	 * Register serviceWorker sync event
-	 * @return {Promise} Resolves if registration is successful
-	 */
-	static registerSync(){
-		navigator.serviceWorker.ready.then(reg => {
-			return reg.sync.register('syncReviews')
-		}).catch(error => {
-			console.error(error);
-		});
-	}
 }
 
 //# sourceMappingURL=../maps/helper.js.map

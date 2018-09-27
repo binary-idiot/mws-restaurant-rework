@@ -38,11 +38,23 @@ handleWorkerMessage = msg => {
 			break;
 		case 'favorited':
 			if(!content)
-				Helper.registerSync();
+				registerSync();
 			updateRestaurants();
 			break;
 	}
 }
+
+/**
+	 * Register serviceWorker sync event
+	 * @return {Promise} Resolves if registration is successful
+	 */
+	registerSync = () =>{
+		navigator.serviceWorker.ready.then(reg => {
+			return reg.sync.register('syncReviews')
+		}).catch(error => {
+			console.error(error);
+		});
+	}
 
 /**
  * Initialize mapbox map
