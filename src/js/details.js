@@ -35,7 +35,10 @@ handleWorkerMessage = msg => {
 	switch(data.retrieved){
 		case 'restaurant':
 			self.restaurant = content;
-			requestAnimationFrame(initMap);
+			if(!newMap){
+				requestAnimationFrame(initMap);
+				fillBreadcrumb();
+			}
 			requestAnimationFrame(fillRestaurantHTML);
 			break;
 		case 'restaurantReviews':
@@ -49,7 +52,7 @@ handleWorkerMessage = msg => {
 				getReviews(self.id);
 			}else{
 				requestAnimationFrame(notifyUploadFail);
-				registerSync();
+				Helper.registerSync();
 			}
 			break;
 		case 'delete':
@@ -57,10 +60,15 @@ handleWorkerMessage = msg => {
 				requestAnimationFrame(notifyDeleteSuccess);
 			}else{
 				requestAnimationFrame(notifyDeleteFail);
-				registerSync();
+				Helper.registerSync();
 			}
 			self.reviews = [];
 			getReviews(self.id);
+			break;
+		case 'favorited':
+			if(!content)
+				Helper.registerSync();
+			getRestaurant(self.id);
 			break;
 	}
 }
@@ -144,6 +152,18 @@ deleteReview = (id, worker = self.worker) => {
 }
 
 /**
+ * Have the worker set favorite to the other state 
+ * @param  {Json} restaurant The restaurant to (un)favorite
+ * @param  {RestaurantWorker} worker worker to handle request
+ */
+toggleFavorite = (restaurant, worker = this.worker) => {
+	let state = false;
+	if(restaurant.is_favorite == false || restaurant.is_favorite == "false")
+		state = true;
+	worker.postMessage({action: 'setFavorite', id:restaurant.id, state:state});
+}
+
+/**
  * Get review from list of reviews
  * @param  {int} id id of review to retrieve
  * @return {Json}    Review from id
@@ -183,18 +203,6 @@ addReviews = newReviews => {
 }
 
 /**
- * Register serviceWorker sync event
- * @return {Promise} Resolves if registration is successful
- */
-registerSync = () => {
-	navigator.serviceWorker.ready.then(reg => {
-		return reg.sync.register('syncReviews')
-	}).catch(error => {
-		console.error(error);
-	});
-}
-
-/**
  * label form as create or update
  */
 fillFormTitle = () => {
@@ -212,8 +220,21 @@ fillFormTitle = () => {
 fillRestaurantHTML = () => {
 	const restaurant = self.restaurant;
 
+	const container = document.getElementById('restaurant-container');
+
 	const name = document.getElementById('restaurant-name');
 	name.innerHTML = restaurant.name;
+
+	const fav = document.getElementById('fav-toggle-button');
+	fav.onclick = e => {toggleFavorite(restaurant)};
+
+	if(restaurant.is_favorite == true || restaurant.is_favorite == "true"){
+		fav.classList.add('favorited');
+		container.setAttribute('aria-label', 'Favorite Restaurant');
+	}else{
+		fav.classList.remove('favorited');
+		container.setAttribute('aria-label', 'Restaurant');
+	}	
 
 	const address = document.getElementById('restaurant-address');
 	address.innerHTML = restaurant.address;
@@ -234,8 +255,6 @@ fillRestaurantHTML = () => {
 	fillRestaurantHoursHTML();
 	}
 
-	// TODO: Add reviews to page
-	fillBreadcrumb();
 }
 
 /**
@@ -244,6 +263,7 @@ fillRestaurantHTML = () => {
  */
 fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
 	const hours = document.getElementById('restaurant-hours');
+	hours.innerHTML = '';
 	for (let key in operatingHours) {
 		const row = document.createElement('tr');
 

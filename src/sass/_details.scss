@@ -30,19 +30,27 @@
 		}
 	}
 }
+#title-container{
+	display: grid;
+	grid-template-columns: 5fr 1fr;
+	grid-column-gap: 10px;
 
-#restaurant-name {
-	color: $orange-2;
-  	font-family: $main-font-family;
-  	font-size: 20pt;
-  	font-weight: 200;
-  	letter-spacing: 0;
-  	margin: 15px 0 30px;
-  	text-transform: uppercase;
-  	line-height: 1.1;
-  	text-align: center;
+	margin: 15px 0 30px;
 
-  	grid-area: Name;
+	#restaurant-name {
+		color: $orange-2;
+	  	font-family: $main-font-family;
+	  	font-size: 20pt;
+	  	font-weight: 200;
+	  	letter-spacing: 0;
+	  	text-transform: uppercase;
+	  	margin: 0;
+	  	text-align: left;
+	}
+
+	#fav-toggle-button{
+		font-size: 200%;
+	}
 }
 
 #restaurant-img {
@@ -101,7 +109,7 @@
 
 		grid-template-columns: 1fr 1fr;
 		grid-template-areas:
-		"Name Name"
+		"Title Title"
 		"Img Img"
 		"Cuisine Cuisine"
 		"Hours Address";

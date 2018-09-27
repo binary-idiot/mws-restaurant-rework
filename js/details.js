@@ -1,2 +1,530 @@
-let restaurant,worker,id,reviews,reviewID;var newMap;document.addEventListener("DOMContentLoaded",e=>{SWHelper.registerServiceWorker(),this.reviews=[],this.worker=new Worker("/js/restaurantWorker.js"),this.worker.onmessage=handleWorkerMessage,this.id=Number(Helper.getParameterByName("id")),this.reviewID=Number(Helper.getParameterByName("review")),requestAnimationFrame(initReviews),getRestaurant(this.id),getReviews(this.id),requestAnimationFrame(fillFormTitle)}),handleWorkerMessage=(e=>{const t=e.data,n=t.msgData;switch(t.retrieved){case"restaurant":self.restaurant=n,requestAnimationFrame(initMap),requestAnimationFrame(fillRestaurantHTML);break;case"restaurantReviews":addReviews(n),requestAnimationFrame(resetReviews);break;case"uploadReview":n?(requestAnimationFrame(notifyUploadSuccess),self.reviews=[],getReviews(self.id)):(requestAnimationFrame(notifyUploadFail),registerSync());break;case"delete":n?requestAnimationFrame(notifyDeleteSuccess):(requestAnimationFrame(notifyDeleteFail),registerSync()),self.reviews=[],getReviews(self.id)}}),initMap=(()=>{const e=self.restaurant;self.newMap=L.map("map",{center:[e.latlng.lat,e.latlng.lng],zoom:16,scrollWheelZoom:!1}),L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}",{mapboxToken:"pk.eyJ1IjoiYmluYXJ5aWRpb3QiLCJhIjoiY2pqMzZjNWRtMWF2YTNrbXRsb2VueGlydyJ9.mkjp31-552zW210Dz1PUcQ",maxZoom:18,attribution:'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',id:"mapbox.streets"}).addTo(newMap),Helper.mapMarkerForRestaurant(self.restaurant,self.newMap)}),initReviews=(()=>{const e=document.getElementById("reviews-container"),t=document.createElement("h3");t.innerHTML="Reviews",e.insertBefore(t,e.firstChild)}),getRestaurant=((e,t=self.worker)=>{t.postMessage({action:"getRestaurant",id:e})}),getReviews=((e,t=self.worker)=>{t.postMessage({action:"getRestaurantReviews",id:e})}),createReview=((e,t=self.worker)=>{t.postMessage({action:"createReview",review:e})}),updateReview=((e,t,n=self.worker)=>{n.postMessage({action:"updateReview",id:e,review:t})}),deleteReview=((e,t=self.worker)=>{t.postMessage({action:"deleteReview",id:e})}),getReview=((e=self.reviewID)=>{for(review of self.reviews)if(review.id==Number(e))return review;return null}),addReviews=(e=>{for(newReview of e){let e=!1;for([index,review]of self.reviews.entries())if(review.id==newReview.id){e=!0,self.reviews[index]=newReview;break}e||self.reviews.push(newReview)}}),registerSync=(()=>{navigator.serviceWorker.ready.then(e=>e.sync.register("syncReviews")).catch(e=>{console.error(e)})}),fillFormTitle=(()=>{const e=document.getElementById("form-title"),t=self.reviewID?"Update":"Create";e.innerHTML=`${t} review`}),fillRestaurantHTML=(()=>{const e=self.restaurant;document.getElementById("restaurant-name").innerHTML=e.name,document.getElementById("restaurant-address").innerHTML=e.address;const t=document.getElementById("restaurant-img"),n=Helper.imageUrlForRestaurant(e);t.className="restaurant-img",t.src=`${n}-small.jpg`,t.srcset=`${n}-small.jpg 300w, ${n}-medium.jpg 600w, ${n}-large.jpg 800w`,t.size="(max-width: 767) calc(100% - 30px), calc(50% - 30px)",t.alt=e.alt,document.getElementById("restaurant-cuisine").innerHTML=e.cuisine_type,e.operating_hours&&fillRestaurantHoursHTML(),fillBreadcrumb()}),fillRestaurantHoursHTML=((e=self.restaurant.operating_hours)=>{const t=document.getElementById("restaurant-hours");for(let n in e){const i=document.createElement("tr"),r=document.createElement("td");r.innerHTML=n,i.appendChild(r);const a=document.createElement("td"),s=e[n].replace(/,/,"<br>");a.innerHTML=s,i.appendChild(a),t.appendChild(i)}}),fillBreadcrumb=(()=>{const e=self.restaurant,t=document.getElementById("breadcrumb"),n=document.createElement("li");n.innerHTML=e.name,t.appendChild(n)}),fillReviewHTML=(()=>{const e=self.reviews,t=document.getElementById("reviews-container");if(0==e.length){const e=document.createElement("p");return e.innerHTML="No reviews yet!",void t.insertBefore(e,t.firstChild.nextSibling)}const n=document.getElementById("reviews-list");for(review of e)n.appendChild(createReviewHTML(review));t.insertBefore(n,t.firstChild.nextSibling)}),fillReviewForm=(()=>{const e=getReview();if(e){document.getElementById("review-name").value=e.name,document.getElementById("review-rating").value=e.rating,document.getElementById("review-comments").value=e.comments}}),clearReviewForm=(()=>{document.getElementById("review-name").value="",document.getElementById("review-rating").value=1,document.getElementById("review-comments").value=""}),resetReviews=(()=>{const e=document.getElementById("no-reviews");e&&e.remove(),document.getElementById("reviews-list").innerHTML="",fillReviewHTML(),self.reviewID&&fillReviewForm()}),createReviewHTML=(e=>{const t=document.createElement("li"),n=document.createElement("div");n.classList.add("review-header");const i=document.createElement("p");i.innerHTML=e.name,i.classList.add("review-name"),n.appendChild(i);const r=document.createElement("p"),a=new Date(e.updatedAt).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});r.innerHTML=a,r.classList.add("review-date"),n.appendChild(r);const s=document.createElement("div");s.classList.add("review-content");const d=document.createElement("p");d.innerHTML=`Rating: ${e.rating}`,d.classList.add("review-rating"),s.appendChild(d);const l=document.createElement("a");l.innerHTML="Edit",l.classList.add("review-edit"),l.href=`${Helper.urlForRestaurant(self.restaurant)}&review=${e.id}#review-form`,s.appendChild(l);const o=document.createElement("a");o.innerHTML="Delete",o.classList.add("review-delete"),o.addEventListener("click",t=>{confirmDelete(e.id)}),s.appendChild(o);const m=document.createElement("p");return m.innerHTML=e.comments,m.classList.add("review-comments"),s.appendChild(m),t.appendChild(n),t.appendChild(s),t}),handleFormSubmit=(()=>{const e=document.getElementById("review-name").value,t=document.getElementById("review-rating"),n=t[t.selectedIndex].value,i=document.getElementById("review-comments").value;self.reviewID?updateReview(self.reviewID,{name:e,rating:n,comments:i}):createReview({restaurant_id:self.id,name:e,rating:n,comments:i}),clearReviewForm()}),confirmDelete=(e=>{const t=document.getElementById("delete-dialog"),n=t.getElementsByTagName("button");for(let t of n)t.addEventListener("click",t=>{"delete"===t.target.value&&deleteReview(e),document.getElementById("delete-dialog").classList.add("hidden"),document.getElementById("dialog-spacer").classList.add("hidden")});t.classList.remove("hidden"),document.getElementById("dialog-spacer").classList.remove("hidden"),document.getElementById("delete-button").focus()}),notifyUploadFail=(()=>{notifyUpdate("Review will be uploaded when reconnected.")}),notifyUploadSuccess=(()=>{notifyUpdate("Review successfully uploaded.")}),notifyDeleteSuccess=(()=>{notifyUpdate("Review successfully deleted")}),notifyDeleteFail=(()=>{notifyUpdate("Review will be deleted when reconnected")}),notifyUpdate=(e=>{const t=document.getElementById("update-dialog");document.getElementById("updateTitle").innerHTML=e;const n=t.getElementsByTagName("button");for(let e of n)e.addEventListener("click",e=>{document.getElementById("update-dialog").classList.add("hidden"),document.getElementById("dialog-spacer").classList.add("hidden")});t.classList.remove("hidden"),document.getElementById("dialog-spacer").classList.remove("hidden"),document.getElementById("dismiss-update-button").focus()});
+let restaurant,
+	worker,
+	id,
+	reviews,
+	reviewID;
+
+var newMap;
+
+	document.addEventListener('DOMContentLoaded', event => {
+		SWHelper.registerServiceWorker();
+
+		this.reviews = [];
+
+		// worker to handle all restaurant retrieval
+		this.worker = new Worker('/js/restaurantWorker.js');
+		this.worker.onmessage = handleWorkerMessage;
+
+		this.id = Number(Helper.getParameterByName('id'));
+		this.reviewID = Number(Helper.getParameterByName('review'));
+		requestAnimationFrame(initReviews);
+		getRestaurant(this.id);
+		getReviews(this.id);
+
+		requestAnimationFrame(fillFormTitle);
+	})
+
+/**
+ * Handle messages from worker thread
+ * @param  {Message} msg Message from worker thread
+ */
+handleWorkerMessage = msg => {
+	const data = msg.data;
+	const content = data.msgData;
+
+	switch(data.retrieved){
+		case 'restaurant':
+			self.restaurant = content;
+			if(!newMap){
+				requestAnimationFrame(initMap);
+				fillBreadcrumb();
+			}
+			requestAnimationFrame(fillRestaurantHTML);
+			break;
+		case 'restaurantReviews':
+			addReviews(content);
+			requestAnimationFrame(resetReviews);
+			break;
+		case 'uploadReview':
+			if(content){
+				requestAnimationFrame(notifyUploadSuccess);
+				self.reviews = [];
+				getReviews(self.id);
+			}else{
+				requestAnimationFrame(notifyUploadFail);
+				Helper.registerSync();
+			}
+			break;
+		case 'delete':
+			if(content){
+				requestAnimationFrame(notifyDeleteSuccess);
+			}else{
+				requestAnimationFrame(notifyDeleteFail);
+				Helper.registerSync();
+			}
+			self.reviews = [];
+			getReviews(self.id);
+			break;
+		case 'favorited':
+			if(!content)
+				Helper.registerSync();
+			getRestaurant(self.id);
+			break;
+	}
+}
+
+/**
+ * Initialize mapbox map
+ */
+initMap = () => {
+	const restaurant = self.restaurant;
+	self.newMap = L.map('map', {
+	    center: [restaurant.latlng.lat, restaurant.latlng.lng],
+	    zoom: 16,
+	    scrollWheelZoom: false
+	  });
+	  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+	    mapboxToken: 'pk.eyJ1IjoiYmluYXJ5aWRpb3QiLCJhIjoiY2pqMzZjNWRtMWF2YTNrbXRsb2VueGlydyJ9.mkjp31-552zW210Dz1PUcQ',
+	    maxZoom: 18,
+	    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+	      '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+	      'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+	    id: 'mapbox.streets'    
+	  }).addTo(newMap);
+
+	  Helper.mapMarkerForRestaurant(self.restaurant, self.newMap);
+}
+
+/**
+ * Setup initial review container
+ */
+initReviews = () => {
+	const container = document.getElementById('reviews-container');
+	const title = document.createElement('h3');
+	title.innerHTML = 'Reviews';
+	container.insertBefore(title, container.firstChild);
+}
+
+/**
+ * Have the worker retrieve a restaurant
+ * @param  {RestaurantWorker} worker worker to handle request
+ * @param  {Int} id     id of restaurant to retrieve
+ */
+getRestaurant = (id, worker = self.worker) => {
+	worker.postMessage({action: 'getRestaurant', id: id});
+}
+
+/**
+ * Have the worker retrieve a review
+ * @param  {int} id     id of review to retrieve
+ * @param  {RestaurantWorker} worker worker to handle request
+ */
+getReviews = (id, worker = self.worker) => {
+	worker.postMessage({action: 'getRestaurantReviews', id: id});
+}
+
+/**
+ * Have the worker create a review
+ * @param  {[Json]} review Review data for creation
+ * @param  {RestaurantWorker} worker worker to handle request
+ */
+createReview = (review, worker = self.worker) => {
+	worker.postMessage({action: 'createReview', review: review});
+}
+
+/**
+ * Have the worker update a review
+ * @param  {int} id     id of the review to update
+ * @param  {Json} review Review data for update
+ * @param  {RestaurantWorker} worker worker to handle request
+ */
+updateReview = (id, review, worker = self.worker) => {
+	worker.postMessage({action: 'updateReview', id: id, review: review});
+}
+
+/**
+ * Have the worker delete the review
+ * @param  {int} id     id of the review to delete
+ * @param  {RestaurantWorker} worker worker to handle the request
+ */
+deleteReview = (id, worker = self.worker) => {
+	worker.postMessage({action: 'deleteReview', id: id});
+}
+
+/**
+ * Have the worker set favorite to the other state 
+ * @param  {Json} restaurant The restaurant to (un)favorite
+ * @param  {RestaurantWorker} worker worker to handle request
+ */
+toggleFavorite = (restaurant, worker = this.worker) => {
+	let state = false;
+	if(restaurant.is_favorite == false || restaurant.is_favorite == "false")
+		state = true;
+	worker.postMessage({action: 'setFavorite', id:restaurant.id, state:state});
+}
+
+/**
+ * Get review from list of reviews
+ * @param  {int} id id of review to retrieve
+ * @return {Json}    Review from id
+ */
+getReview = (id = self.reviewID) => {
+	for(review of self.reviews){
+		if(review.id == Number(id))
+			return review;
+		
+	}
+
+	return null;
+} 
+/**
+ * Add or update self.reviews
+ * @param  {Json} newReviews Restaurants to add
+ */
+addReviews = newReviews => {
+
+	for(newReview of newReviews){
+		let reviewFound = false;
+
+		// if review is already in self.reviews then update it otherwise add it to the list;
+		for([index, review] of self.reviews.entries()){
+			if(review.id == newReview.id){
+				reviewFound = true;
+				self.reviews[index] = newReview;
+				break;
+			}
+		}
+
+		if(!reviewFound){
+			self.reviews.push(newReview);
+		}
+	}
+
+}
+
+/**
+ * label form as create or update
+ */
+fillFormTitle = () => {
+	const title = document.getElementById('form-title');
+	const type = (self.reviewID) ? 'Update' : 'Create';
+
+	title.innerHTML = `${type} review`;
+
+}
+
+/**
+ * Fill restaurant page with restaurant data
+ * @param  {Json} restaurant Restaurant to fill page with
+ */
+fillRestaurantHTML = () => {
+	const restaurant = self.restaurant;
+
+	const container = document.getElementById('restaurant-container');
+
+	const name = document.getElementById('restaurant-name');
+	name.innerHTML = restaurant.name;
+
+	const fav = document.getElementById('fav-toggle-button');
+	fav.onclick = e => {toggleFavorite(restaurant)};
+
+	if(restaurant.is_favorite == true || restaurant.is_favorite == "true"){
+		fav.classList.add('favorited');
+		container.setAttribute('aria-label', 'Favorite Restaurant');
+	}else{
+		fav.classList.remove('favorited');
+		container.setAttribute('aria-label', 'Restaurant');
+	}	
+
+	const address = document.getElementById('restaurant-address');
+	address.innerHTML = restaurant.address;
+
+	const image = document.getElementById('restaurant-img');
+	const imgSrc =  Helper.imageUrlForRestaurant(restaurant);
+	image.className = 'restaurant-img'
+	image.src = `${ imgSrc }-small.jpg`;
+	image.srcset = `${ imgSrc }-small.jpg 300w, ${ imgSrc }-medium.jpg 600w, ${ imgSrc }-large.jpg 800w`;
+	image.size = '(max-width: 767) calc(100% - 30px), calc(50% - 30px)';
+	image.alt = restaurant.alt;
+
+	const cuisine = document.getElementById('restaurant-cuisine');
+	cuisine.innerHTML = restaurant.cuisine_type;
+
+	// fill operating hours
+	if (restaurant.operating_hours) {
+	fillRestaurantHoursHTML();
+	}
+
+}
+
+/**
+ * Fill operating hours section
+ * @param  {Json} operatingHours Operating hours to add to page
+ */
+fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
+	const hours = document.getElementById('restaurant-hours');
+	hours.innerHTML = '';
+	for (let key in operatingHours) {
+		const row = document.createElement('tr');
+
+		const day = document.createElement('td');
+		day.innerHTML = key;
+		row.appendChild(day);
+
+		const time = document.createElement('td');
+		const oh = operatingHours[key].replace(/,/, '<br>');
+		time.innerHTML = oh;
+		row.appendChild(time);
+
+		hours.appendChild(row);
+	}
+}
+
+/**
+ * Fill page breadcrumb
+ * @param  {Json} restaurant Restaurant for page
+ */
+fillBreadcrumb = () => {
+	const restaurant = self.restaurant;
+
+	const breadcrumb = document.getElementById('breadcrumb');
+	const li = document.createElement('li');
+	li.innerHTML = restaurant.name;
+	breadcrumb.appendChild(li);
+}
+
+/**
+ * Add reviews to page
+ */
+fillReviewHTML = () => {
+	const reviews = self.reviews;
+	const container = document.getElementById('reviews-container');
+	
+	if (reviews.length == 0) {
+		const noReviews = document.createElement('p');
+		noReviews.innerHTML = 'No reviews yet!';
+		container.insertBefore(noReviews, container.firstChild.nextSibling);
+		return;
+	}
+	const ul = document.getElementById('reviews-list');
+	for(review of reviews){
+		ul.appendChild(createReviewHTML(review));
+	}
+	container.insertBefore(ul, container.firstChild.nextSibling);
+
+}
+
+/**
+ * Fill form review data if updating
+ */
+fillReviewForm = () => {
+	const review = getReview();
+	if(review){
+		const name = document.getElementById('review-name');
+		name.value = review.name;
+
+		const rating = document.getElementById('review-rating');
+		rating.value = review.rating;
+
+		const comments = document.getElementById('review-comments');
+		comments.value = review.comments;
+	}
+}
+
+/**
+ * Clear the fields of the review form
+ */
+clearReviewForm = () => {
+	const name = document.getElementById('review-name');
+	name.value = '';
+
+	const rating = document.getElementById('review-rating');
+	rating.value = 1;
+
+	const comments = document.getElementById('review-comments');
+	comments.value = '';
+}
+
+/**
+ * Reset the review container
+ */
+resetReviews = () => {
+
+	const noReviews = document.getElementById('no-reviews');
+	if(noReviews)
+		noReviews.remove();
+
+	const ul = document.getElementById('reviews-list');
+	ul.innerHTML = '';
+
+	fillReviewHTML();
+
+	if(self.reviewID){
+		fillReviewForm();
+	}
+}
+
+/**
+ * Create review item
+ * @param  {Json} review The review to create
+ * @return {HTML}        A li of the review
+ */
+createReviewHTML = (review) => {
+
+	const li = document.createElement('li');
+
+	const header = document.createElement('div');
+	header.classList.add("review-header");
+
+	const name = document.createElement('p');
+	name.innerHTML = review.name;
+	name.classList.add('review-name');
+	header.appendChild(name);
+
+	const date = document.createElement('p');
+	const dateMili = new Date(review.updatedAt); // Date is in milliseconds
+	const dateString = dateMili.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
+	date.innerHTML = dateString;
+	date.classList.add('review-date');
+	header.appendChild(date);
+
+	const content = document.createElement('div');
+	content.classList.add("review-content");
+
+	const rating = document.createElement('p');
+	rating.innerHTML = `Rating: ${review.rating}`;
+	rating.classList.add('review-rating');
+	content.appendChild(rating);
+
+	const edit = document.createElement('a');
+	edit.innerHTML = 'Edit';
+	edit.classList.add('review-edit');
+	// Link to restaurant page with review as a param, will also move focus to the edit form automatically
+	edit.href = `${Helper.urlForRestaurant(self.restaurant)}&review=${review.id}#review-form`;
+	content.appendChild(edit);
+
+	const deleteReview = document.createElement('a');
+	deleteReview.innerHTML = 'Delete';
+	deleteReview.classList.add('review-delete');
+	deleteReview.addEventListener('click', e => {confirmDelete(review.id)});
+	content.appendChild(deleteReview);
+
+	const comments = document.createElement('p');
+	comments.innerHTML = review.comments;
+	comments.classList.add('review-comments');
+	content.appendChild(comments);
+
+	li.appendChild(header);
+	li.appendChild(content);
+
+	return li;
+}
+
+/**
+ * Handle form submission
+ */
+handleFormSubmit = () => {
+	const name = document.getElementById('review-name').value;
+
+	const ratingSelect = document.getElementById('review-rating');
+	const rating = ratingSelect[ratingSelect.selectedIndex].value;
+
+	const comments = document.getElementById('review-comments').value;
+
+	if(!self.reviewID){
+		createReview({
+			'restaurant_id': self.id,
+			'name': name,
+			'rating': rating,
+			'comments': comments
+		});
+	}else{
+		updateReview(self.reviewID, {
+			'name': name,
+			'rating': rating,
+			'comments': comments
+		});
+	}
+
+	clearReviewForm();
+
+}
+
+/**
+ * confirm the deletion of review
+ * @param  {int} id review to delete
+ */
+confirmDelete = id => {
+	const dialog = document.getElementById('delete-dialog');
+
+	const buttons = dialog.getElementsByTagName('button');
+	for(let button of buttons){
+		button.addEventListener('click', e => {
+			if(e.target.value === 'delete'){
+				deleteReview(id);
+			}
+			document.getElementById('delete-dialog').classList.add('hidden');
+    		document.getElementById('dialog-spacer').classList.add('hidden');
+		})
+	}
+
+	dialog.classList.remove('hidden');
+	document.getElementById('dialog-spacer').classList.remove('hidden');
+	document.getElementById('delete-button').focus();
+}
+
+/**
+ * Notify when review fails to upload
+ */
+notifyUploadFail = () => {
+	const notify = 'Review will be uploaded when reconnected.';
+	notifyUpdate(notify);
+}
+
+/**
+ * Notify when review uploads
+ */
+notifyUploadSuccess = () => {
+	const notify = 'Review successfully uploaded.';
+	notifyUpdate(notify);
+}
+
+/**
+ * Notify when review is deleted
+ */
+notifyDeleteSuccess = () => {
+	const notify = 'Review successfully deleted';
+	notifyUpdate(notify);
+}
+
+/**
+ * Notify when review fails to delete
+ */
+notifyDeleteFail = () => {
+	const notify = 'Review will be deleted when reconnected';
+	notifyUpdate(notify);
+}
+
+/**
+ * Display notify dialog
+ * @param  {String} notify Message to display
+ */
+notifyUpdate = notify => {
+	const dialog = document.getElementById('update-dialog');
+	const title = document.getElementById('updateTitle');
+	title.innerHTML = notify;
+
+	const buttons = dialog.getElementsByTagName('button');
+	for(let button of buttons){
+		button.addEventListener('click', e => {
+			document.getElementById('update-dialog').classList.add('hidden');
+    		document.getElementById('dialog-spacer').classList.add('hidden');
+		})
+	}
+
+	dialog.classList.remove('hidden');
+	document.getElementById('dialog-spacer').classList.remove('hidden');
+	document.getElementById('dismiss-update-button').focus();
+
+}
 //# sourceMappingURL=../maps/details.js.map

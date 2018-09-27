@@ -128,3 +128,30 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 	max-width: 100%;
 	background-color: $grey-4;
 }
+
+/* ====================== Favorite ====================== */
+
+.fav-button{
+  display: inline-block;
+  border: none;
+  padding: 0;
+  text-decoration: none;
+  background-color: transparent;
+  font-family:Arial sans-serif;
+  font-size: 20pt;
+  cursor: pointer;
+  text-align: center;
+  transition: background 250ms ease-in-out, 
+              transform 150ms ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  &:hover{
+    color: $orange-2;
+  }
+
+}
+
+.favorited {
+  color: $orange-1;
+}

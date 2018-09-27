@@ -1,2 +1,128 @@
-class APIHelper{static get API_URL(){return"http://localhost:1337"}static getRestaurant(e=""){return fetch(`${APIHelper.API_URL}/restaurants/${e}`).then(e=>{if(!e.ok)throw new Error(`Request failed. Returned status of ${e.status}`);return e.json()}).catch(e=>{console.error(e)})}static getFavorites(){return getRestaurant("?is_favorite=true")}static getReview(e="",t=!1){const r=t?"?restaurant_id=":"";return fetch(`${APIHelper.API_URL}/reviews/${r}${e}`).then(e=>{if(!e.ok)throw new Error(`Request failed. Returned status of ${e.status}`);return e.json()}).catch(e=>{console.error(e)})}static createReview(e){return fetch(`${APIHelper.API_URL}/reviews/`,{method:"post",body:JSON.stringify(e)}).then(e=>{if(!e.ok)throw new Error(`Request failed. Returned status of ${e.status}`);return!0}).catch(e=>(console.error(e),!1))}static updateFavorite(e,t){return fetch(`${APIHelper.API_URL}/restaurants/${e}/?is_favorite=${t}`,{method:"put"}).then(e=>{if(!e.ok)throw new Error(`Request failed. Returned status of ${e.status}`);return!0}).catch(e=>(console.error(e),!1))}static updateReview(e,t){return fetch(`${APIHelper.API_URL}/reviews/${e}`,{method:"put",body:JSON.stringify(t)}).then(e=>{if(!e.ok)throw new Error(`Request failed. Returned status of ${e.status}`);return!0}).catch(e=>(console.error(e),!1))}static deleteReview(e){return fetch(`${APIHelper.API_URL}/reviews/${e}`,{method:"delete"}).then(e=>{if(!e.ok)throw new Error(`Request failed. Returned status of ${e.status}`);return!0}).catch(e=>(console.error(e),!1))}}
+
+class APIHelper{
+
+	/**
+ 	* URL to restaurant API
+ 	*/
+	static get API_URL(){
+		const port = 1337;
+		return `http://localhost:${port}`
+	}
+
+	/**
+	 * GET restaurants from API
+	 * @param  {String} query id of restaurant or a url query
+	 * @return {Promise}    Promise that resolves to restaurant json from API
+	 */
+	static getRestaurant(query = ''){
+		return fetch(`${APIHelper.API_URL}/restaurants/${query}`).then(response => {
+			if(!response.ok)
+				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return response.json();
+		}).catch(error => {
+			console.error(error);
+		});
+	}
+
+	/**
+	 * Retrive favorite restaurants by passing favorite query to getRestaurant()
+	 * @return {Promise} Promise that resolves favorite restaurant json from API
+	 */
+	static getFavorites(){
+		return getRestaurant('?is_favorite=true');
+	}
+
+	/**
+	 * Retrive restaurant reviews
+	 * @param  {Int}  id            Id of review or restaurant
+	 * @param  {Boolean} forRestaurant If true will return all reviews for restaurant given by id
+	 * @return {Promise}                Promise that resolves to review json from API
+	 */
+	static getReview(id = '', forRestaurant = false){
+		const queryString = (forRestaurant) ? '?restaurant_id=' : '';
+
+		return fetch(`${APIHelper.API_URL}/reviews/${queryString}${id}`).then(response => {
+			if(!response.ok)
+				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return response.json();	
+		}).catch(error => {
+			console.error(error);
+		});
+	}
+
+	/**
+	 * POST review to API
+	 * @param  {Json} review Review Json
+	 * @return {Boolean}	Return true if successful false if not
+	 */
+	static createReview(review){
+		return fetch(`${APIHelper.API_URL}/reviews/`, {
+			method: 'post',
+			body: JSON.stringify(review)
+		}).then(response => {
+			if(!response.ok)
+				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return true;
+		}).catch(error => {
+			console.error(error);
+			return false;
+		});
+	}
+
+	/**
+	 * Update favorite restaurants
+	 * @param  {Int} id    Id of restaurant
+	 * @param  {Boolean} state State of favorite
+	 * @return {Boolean}	Return true if successful false if not
+	 */
+	static updateFavorite(id, state){
+		return fetch(`${APIHelper.API_URL}/restaurants/${id}/?is_favorite=${state}`, {method: 'put'}).then(response => {
+			if(!response.ok)
+				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return true;
+		}).catch(error => {
+			console.error(error);
+			return false
+		});
+	}
+
+	/**
+	 * Update exsisting review
+	 * @param  {Int} id     Id of review to update
+	 * @param  {Json} review Review json
+	 * @return {Boolean}	Return true if successful false if not
+	 */
+	static updateReview(id, review){
+		return fetch(`${APIHelper.API_URL}/reviews/${id}`, {
+			method: 'put',
+			body: JSON.stringify(review)
+		}).then(response => {
+			if(!response.ok)
+				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return true;
+		}).catch(error => {
+			console.error(error);
+			return false;
+		});
+	}
+
+	/**
+	 * Delete review
+	 * @param  {Int} id Id of review to delete
+	 * @return {Boolean}	Return true if successful false if not
+	 */
+	static deleteReview(id){
+		return fetch(`${APIHelper.API_URL}/reviews/${id}`, {
+			method: 'delete'
+		}).then(response => {
+			if(!response.ok)
+				throw new Error(`Request failed. Returned status of ${response.status}`);
+			return true;
+		}).catch(error => {
+			console.error(error);
+			return false;
+		})
+	}
+}
+
 //# sourceMappingURL=../maps/apihelper.js.map

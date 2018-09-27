@@ -98,6 +98,26 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   max-width: 100%;
   background-color: #ccc; }
 
+/* ====================== Favorite ====================== */
+.fav-button {
+  display: inline-block;
+  border: none;
+  padding: 0;
+  text-decoration: none;
+  background-color: transparent;
+  font-family: Arial sans-serif;
+  font-size: 20pt;
+  cursor: pointer;
+  text-align: center;
+  transition: background 250ms ease-in-out,  transform 150ms ease;
+  -webkit-appearance: none;
+  -moz-appearance: none; }
+  .fav-button:hover {
+    color: #f18200; }
+
+.favorited {
+  color: orange; }
+
 /* ====================== Dialog ====================== */
 .dialog {
   background-color: #ccc;
@@ -266,21 +286,6 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
         line-height: 1.3;
         margin: 20px 0 10px;
         text-transform: uppercase; }
-      #restaurants-list li .restaurant-container .fav-button {
-        display: inline-block;
-        border: none;
-        padding: 0;
-        text-decoration: none;
-        background-color: transparent;
-        font-family: Arial sans-serif;
-        font-size: 20pt;
-        cursor: pointer;
-        text-align: center;
-        transition: background 250ms ease-in-out,  transform 150ms ease;
-        -webkit-appearance: none;
-        -moz-appearance: none; }
-        #restaurants-list li .restaurant-container .fav-button:hover, #restaurants-list li .restaurant-container .fav-button:focus {
-          color: #f18200; }
       #restaurants-list li .restaurant-container p {
         grid-column-end: span 2; }
     #restaurants-list li a {
@@ -298,9 +303,6 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
     background-color: #ccc;
     display: block;
     max-width: 100%; }
-
-.favorited .fav-button {
-  color: orange; }
 
 /* ====================== Restaurant Details ====================== */
 .details header {
@@ -323,17 +325,22 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
     grid-template-columns: 1fr 1fr;
     grid-template-areas: "Map Map" "Reviews Restaurant"; } }
 
-#restaurant-name {
-  color: #f18200;
-  font-family: Arial, sans-serif;
-  font-size: 20pt;
-  font-weight: 200;
-  letter-spacing: 0;
-  margin: 15px 0 30px;
-  text-transform: uppercase;
-  line-height: 1.1;
-  text-align: center;
-  grid-area: Name; }
+#title-container {
+  display: grid;
+  grid-template-columns: 5fr 1fr;
+  grid-column-gap: 10px;
+  margin: 15px 0 30px; }
+  #title-container #restaurant-name {
+    color: #f18200;
+    font-family: Arial, sans-serif;
+    font-size: 20pt;
+    font-weight: 200;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    margin: 0;
+    text-align: left; }
+  #title-container #fav-toggle-button {
+    font-size: 200%; }
 
 #restaurant-img {
   max-width: 100%;
@@ -378,7 +385,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
     #restaurant-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-areas: "Name Name" "Img Img" "Cuisine Cuisine" "Hours Address"; } }
+      grid-template-areas: "Title Title" "Img Img" "Cuisine Cuisine" "Hours Address"; } }
 
 #reviews-container {
   grid-area: Reviews; }

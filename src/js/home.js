@@ -36,6 +36,11 @@ handleWorkerMessage = msg => {
 			self.cuisines = content.cuisines;
 			requestAnimationFrame(fillCuisineHTML);
 			break;
+		case 'favorited':
+			if(!content)
+				Helper.registerSync();
+			updateRestaurants();
+			break;
 	}
 }
 
@@ -74,13 +79,17 @@ getRestaurants = (filter, worker = this.worker) => {
 getNeighborhoodsAndCuisines = (worker = this.worker) => {
 	worker.postMessage({action: 'getNeighborhoodsAndCuisines'});
 }
+
 /**
  * Have the worker set favorite to the other state 
  * @param  {Json} restaurant The restaurant to (un)favorite
  * @param  {RestaurantWorker} worker worker to handle request
  */
 toggleFavorite = (restaurant, worker = this.worker) => {
-	worker.postMessage({action: 'setFavorite', id:restaurant.id, state:!restaurant.is_favorite});
+	let state = false;
+	if(restaurant.is_favorite == false || restaurant.is_favorite == "false")
+		state = true;
+	worker.postMessage({action: 'setFavorite', id:restaurant.id, state:state});
 }
 
 /**
@@ -188,13 +197,6 @@ resetRestaurants = () => {
 createRestaurantHTML = restaurant => {
 	const li = document.createElement('li');
 
-	if(restaurant.is_favorite){
-		li.classList.add('favorited');
-		li.setAttribute('aria-label', 'Favorite Restaurant');
-	}else{
-		li.setAttribute('aria-label', 'Restaurant');
-	}
-
 	const image = document.createElement('img');
 	const imgSrc = Helper.imageUrlForRestaurant(restaurant); 
 	image.className = 'restaurant-img';
@@ -217,6 +219,17 @@ createRestaurantHTML = restaurant => {
 	fav.onclick = e => {toggleFavorite(restaurant)};
 	fav.classList.add('fav-button');
 	fav.setAttribute('aria-label', 'Toggle favorite');
+
+	console.log(`restaurant ${restaurant.id} is ${restaurant.is_favorite}`);
+
+	if(restaurant.is_favorite == true || restaurant.is_favorite == "true"){
+		fav.classList.add('favorited');
+		li.setAttribute('aria-label', 'Favorite Restaurant');
+	}else{
+		fav.classList.remove('favorited');
+		li.setAttribute('aria-label', 'Restaurant');
+	}
+
 	titleContainer.append(fav);
 
 	const neighborhood = document.createElement('p');
