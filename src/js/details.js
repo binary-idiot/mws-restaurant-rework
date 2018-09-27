@@ -315,9 +315,13 @@ fillReviewHTML = () => {
 	if (reviews.length == 0) {
 		const noReviews = document.createElement('p');
 		noReviews.innerHTML = 'No reviews yet!';
+		noReviews.setAttribute('id', 'no-reviews');
 		container.insertBefore(noReviews, container.firstChild.nextSibling);
 		return;
 	}
+	const nor = document.getElementById('no-reviews');
+	if(nor) //Without this "No reviews yet!" will be shown under reviews first time page is loaded
+		container.removeChild(nor);
 	const ul = document.getElementById('reviews-list');
 	for(review of reviews){
 		ul.appendChild(createReviewHTML(review));
@@ -458,8 +462,7 @@ handleFormSubmit = () => {
 		});
 	}
 
-	clearReviewForm();
-
+	window.location.href = Helper.urlForRestaurant(self.restaurant);
 }
 
 /**
