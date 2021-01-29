@@ -13,7 +13,7 @@ self.addEventListener('install', event =>{
 				'js/home.js', 'js/details.js', 'js/restaurantWorker.js',
 				'js/dbhelper.js', 'js/apihelper.js', 'js/helper.js', 'js/swhelper.js',
 				'css/styles.css',
-				'https://rawgit.com/jakearchibald/idb/master/lib/idb.js',
+				'https://cdn.jsdelivr.net/npm/idb@2.1.3/lib/idb.min.js',
 				'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
 				'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js']);
 		})
@@ -119,7 +119,7 @@ self.addEventListener('sync', event => {
 });
 
 self.addEventListener('fetch', event => {
-	if(!event.request.url.startsWith('http://localhost:1337/'))
+	if(!event.request.url.startsWith('http://localhost:8081/'))
 		if(event.request.url.startsWith('http://localhost:8080/restaurant.html')){
 			event.respondWith(
 				caches.open(`${staticCache}${staticVer}`).then(cache => {

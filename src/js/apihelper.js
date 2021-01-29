@@ -5,7 +5,7 @@ class APIHelper{
  	* URL to restaurant API
  	*/
 	static get API_URL(){
-		const port = 1337;
+		const port = 8081;
 		return `http://localhost:${port}`
 	}
 

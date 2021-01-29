@@ -1,4 +1,5 @@
-importScripts('https://rawgit.com/jakearchibald/idb/master/lib/idb.js')
+importScripts('https://cdn.jsdelivr.net/npm/idb@2.1.3/lib/idb.min.js')
+
 
 var restaurantDb = idb.open('restaurants-db', 5, db => {
   switch(db.oldVersion){
